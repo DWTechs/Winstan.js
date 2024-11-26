@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+
+  winstan:
+    build: ./
+    container_name: winstan
+    volumes:
+      - ./:/usr/src/app
+      - winstan_node_modules:/usr/src/app/node_modules
+
+
+volumes:
+  winstan_node_modules:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/node_modules
