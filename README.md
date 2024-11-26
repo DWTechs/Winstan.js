@@ -2,7 +2,6 @@
 [![License: MIT](https://img.shields.io/npm/l/@dwtechs/sparray.svg?color=brightgreen)](https://opensource.org/licenses/MIT)
 [![npm version](https://badge.fury.io/js/%40dwtechs%2Fsparray.svg)](https://www.npmjs.com/package/@dwtechs/sparray)
 [![last version release date](https://img.shields.io/github/release-date/DWTechs/Sparray.js)](https://www.npmjs.com/package/@dwtechs/sparray)
-![Jest:coverage](https://img.shields.io/badge/Jest:coverage-100%25-brightgreen.svg)
 [![minified size](https://img.shields.io/bundlephobia/min/@dwtechs/sparray?color=brightgreen)](https://www.npmjs.com/package/@dwtechs/sparray)
 
 - [Synopsis](#synopsis)
@@ -18,7 +17,7 @@
 
 ## Synopsis
 
-**[Sparray.js](https://github.com/DWTechs/Sparray.js)** is an Open source arrays toolkit library for Javascript.
+**[Winstan.js](https://github.com/DWTechs/Winstan.js)** is an Open source arrays toolkit library for Javascript.
 
 - Only 1 small dependency to check inputs variables
 - Very lightweight
@@ -30,7 +29,7 @@
 
 ## Support
 
-- node: 14
+- node: 16
 
 This is the oldest targeted versions. The library should work properly on older versions of Node.js but we do not support it officially.  
 
@@ -38,7 +37,7 @@ This is the oldest targeted versions. The library should work properly on older 
 ## Installation
 
 ```bash
-$ npm i @dwtechs/sparray
+$ npm i @dwtechs/winstan
 ```
 
 
@@ -48,7 +47,7 @@ $ npm i @dwtechs/sparray
 ### ES6 / TypeScript
 
 ```javascript
-import { chunk } from "@dwtechs/sparray";
+import { chunk } from "@dwtechs/winstan";
 
 function chunkArray(req, res, next) {
   req.chunks = chunk(req.body.rows, null);
@@ -66,7 +65,7 @@ export {
 
 ```javascript
 
-const sp = require("@dwtechs/sparray");
+const sp = require("@dwtechs/winstan");
 
 function chunk(req, res, next) {
   req.chunks = sp.chunk(req.body.rows, null);
@@ -85,30 +84,16 @@ module.exports = {
 
 ```javascript
 
-let chunkSize = 100 //Default value
+init(timeZone: string, serviceName: string, nodeEnv: string): void {}
 
-getChunkSize(): number {}
-
-setChunkSize(size: number): number {}
-
-chunk(rows: any[], size?: number = chunkSize): any[] {}
-
-checkCommonValues(a: any[], b: any[]): boolean {}
-
-getCommonValues(a: any[], b: any[]): any[] {}
-
-// Flatten a chunked array
-flatten(chunks: any[]): any[] {}
-
-// delete a list of properties
-deleteProps(arr: Record<string, any>[], props: string[]): Record<string, any>[] {}
+log(size: number): number {}
 
 ```
 
 ## Contributors
 
-Sparray.js is still in development and we would be glad to get all the help you can provide.
-To contribute please read **[contributor.md](https://github.com/DWTechs/Sparray.js/blob/main/contributor.md)** for detailed installation guide.
+Winstan.js is still in development and we would be glad to get all the help you can provide.
+To contribute please read **[contributor.md](https://github.com/DWTechs/Winstan.js/blob/main/contributor.md)** for detailed installation guide.
 
 
 ## Stack
