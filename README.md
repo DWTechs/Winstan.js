@@ -10,6 +10,7 @@
 - [Usage](#usage)
   - [ES6](#es6)
   - [CommonJS](#commonjs)
+- [Configure](#configure)
 - [API Reference](#api-reference)
 - [Contributors](#contributors)
 - [Stack](#stack)
@@ -47,34 +48,77 @@ $ npm i @dwtechs/winstan
 ### ES6 / TypeScript
 
 ```javascript
-import { chunk } from "@dwtechs/winstan";
+import { log } from "@dwtechs/winstan";
 
-function chunkArray(req, res, next) {
-  req.chunks = chunk(req.body.rows, null);
-  next();
-}
-
-export {
-  chunkArray,
-};
+log.error(`App cannot start: ${err.msg}`);
+log.info(`App started on port : ${PORT}`);
+log.debug(`UpdateOne(user=${JSON.stringify(users)})`);
 
 ```
-
 
 ### CommonJS
 
 ```javascript
 
-const sp = require("@dwtechs/winstan");
+const log = require("@dwtechs/winstan");
 
-function chunk(req, res, next) {
-  req.chunks = sp.chunk(req.body.rows, null);
-  next();
-}
+log.error(`App cannot start: ${err.msg}`);
+log.info(`App started on port : ${PORT}`);
+log.debug(`UpdateOne(user=${JSON.stringify(users)})`);
 
-module.exports = {
-  chunk,
-};
+```
+
+### Levels
+
+Winstan reduces log levels to four : 
+  - error,
+  - warn,
+  - info,
+  - debug
+
+
+## Configure
+
+Winstan will start with the following default configuration : 
+
+```Javascript
+  let defaultSN = "";
+  let defaultTZ = "europe/paris";
+  let defaultNodeEnv = "development";
+```
+
+**DefaultSN** is the service name. (Or the application name)
+If provided, it will appear at the beginning of every log.
+It is useful in a multi-service or multi-application monitoring tool.
+
+You can configure Winstan using 2 methods :
+
+### TZ, NODE_ENV and SERVICE_NAME environment variables
+
+Those three environment variables are looked up at start-up : 
+
+example : 
+```bash
+  TZ="UTC"
+  NODE_ENV="production"
+  SERVICE_NAME="ms_user"
+```
+
+Possible values for **NODE_ENV** are "production" and "prod".
+Those values will set Winstan log level to **info**.
+Any other value (like "dev" or "development") will set Winstan log level to **debug**
+
+**TZ** is the usual timezone configuration in order to set logs time to your region.
+
+### initLogger()
+
+This method will override ENV variables.
+
+```javascript
+
+import { log, initLogger } from "@dwtechs/winstan";
+
+initLogger("UTC", "ms_user", "debug");
 
 ```
 
@@ -84,7 +128,9 @@ module.exports = {
 
 ```javascript
 
-init(timeZone: string, serviceName: string, nodeEnv: string): void {}
+export type Levels = 'error'|'warn'|'info'|'debug';
+
+initLogger(timeZone: string, serviceName: string, nodeEnv: string): void {}
 
 log(size: number): number {}
 

@@ -1,10 +1,19 @@
 import type { Levels } from "./types";
 import winston/*, { transports, format, addColors, createLogger }*/ from "winston";
-import { isStringOfLength } from "@dwtechs/checkard";
+import { isStringOfLength, isCustomType } from "@dwtechs/checkard";
 
-// Start 
-// const level = (nodeEnv === "development") ? "debug" : "warn";
-// init("europe/paris", "serviceName", level);
+let defaultSN = "serviceName";
+let defaultTZ = "europe/paris";
+let defaultNodeEnv = "development";
+
+// check for env variables
+if (process?.env) {
+  const { TZ, NODE_ENV, SERVICE_NAME } = process.env;
+  defaultTZ = TZ || defaultTZ;
+  defaultNodeEnv = NODE_ENV || defaultNodeEnv;
+  defaultSN = SERVICE_NAME || defaultSN;
+} 
+const defaultLvl = (defaultNodeEnv === "prod" || defaultNodeEnv === "production") ? "info" : "debug";
 
 const levels = {
   error: 0,
@@ -13,32 +22,17 @@ const levels = {
   debug: 3,
 };
 
-const colors = {
-  error: "red",
-  warn: "yellow",
-  info: "green",
-  debug: "white",
-};
-winston.addColors(colors);
+// const colors = {
+//   error: "red",
+//   warn: "yellow",
+//   info: "green",
+//   debug: "white",
+// };
+// winston.addColors(colors);
 
-const defaultLvl = "debug";
-const defaultTZ = "europe/paris";
-const defaultSN = "serviceName";
-let lvl: Levels = setLevel(defaultLvl);
+let lvl: Levels = defaultLvl;
 let format = setFormat(defaultTZ, "serviceName");
 const transports = setTransports();
-
-// Type guard function to check if a value is of type Levels
-function isLevel(level: any): level is Levels {
-  if (!isStringOfLength(level, 4, 5)) 
-    return false;
-  // return levels.includes(level);
-  return Object.keys(levels).includes(level);
-}
-
-function setLevel(level: Levels): Levels {
-  return isLevel(level) ? level : lvl;
-}
 
 function setTimeZone(timeZone: string): string { 
   return isStringOfLength(timeZone, 2, 999) ? timeZone : defaultTZ;
@@ -53,30 +47,33 @@ function setTransports(): winston.transport[] {
 } 
 
 function setFormat(timeZone: string, serviceName: string): winston.format {
+  const tz = setTimeZone(timeZone);
+  const sn = setServiceName(serviceName);
+  const snLog = sn ? `${sn} ` : "";
   return winston.format.combine(
     winston.format.colorize({ all: true }),
-    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss:ms", tz: setTimeZone(timeZone) }),
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss:ms", tz }),
     winston.format.align(),
     winston.format.printf(
       (info: winston.Logform.TransformableInfo) =>
-        `[${info.timestamp}] - ${setServiceName(serviceName)} ${info.level}: ${info.message
+        `[${info.timestamp}] - ${snLog}${info.level}: ${info.message
           ?.replace(/[\n\r]+/g, "")
           .replace(/\s{2,}/g, " ")}`,
     ),
   );
 }
 
-function init(timeZone: string, serviceName: string, level: Levels): void {
-  lvl = setLevel(level);
+function initLogger(timeZone: string, serviceName: string, level: Levels): void {
+  lvl = isCustomType(level, levels) ? level : lvl;
   format = setFormat(timeZone, serviceName);
 }
 
-function log(): winston.Logger {
+const log = (): winston.Logger => {
   return winston.createLogger({ lvl, levels, format, transports });
 }
 
 export {
-  init, 
+  initLogger, 
   log,
 }
 
