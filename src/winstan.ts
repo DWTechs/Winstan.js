@@ -1,20 +1,22 @@
 import type { Levels } from "./types";
-import winston/*, { transports, format, addColors, createLogger }*/ from "winston";
-import { isStringOfLength, isCustomType } from "@dwtechs/checkard";
+import type { Logform, Logger, transport } from "winston";
+import * as winston from "winston";
+import { isStringOfLength, isProperty } from "@dwtechs/checkard";
 
 let defaultSN = "serviceName";
+let defaultLocale = "fr-FR";
 let defaultTZ = "europe/paris";
 let defaultNodeEnv = "development";
 
 // check for env variables
 if (process?.env) {
-  const { TZ, NODE_ENV, SERVICE_NAME } = process.env;
+  const { LOCALE, TZ, NODE_ENV, SERVICE_NAME } = process.env;
+  defaultLocale = LOCALE || defaultLocale;
   defaultTZ = TZ || defaultTZ;
   defaultNodeEnv = NODE_ENV || defaultNodeEnv;
   defaultSN = SERVICE_NAME || defaultSN;
-} 
+}
 const defaultLvl = (defaultNodeEnv === "prod" || defaultNodeEnv === "production") ? "info" : "debug";
-
 const levels = {
   error: 0,
   warn: 1,
@@ -31,49 +33,65 @@ const levels = {
 // winston.addColors(colors);
 
 let lvl: Levels = defaultLvl;
-let format = setFormat(defaultTZ, "serviceName");
-const transports = setTransports();
+let fmt = setFormat(defaultTZ, "serviceName");
+const tpts = setTransports();
 
-function setTimeZone(timeZone: string): string { 
-  return isStringOfLength(timeZone, 2, 999) ? timeZone : defaultTZ;
+// YYYY-MM-DD HH:mm:ss:ms
+function getTimezonedDate(timeZone: string): string {
+  return new Date().toLocaleString(defaultLocale, { timeZone });
+}
+
+function getFormatDate(timeZone: string): string { 
+  return isStringOfLength(timeZone, 2, 999) ? getTimezonedDate(timeZone) : getTimezonedDate(defaultTZ);
 }
 
 function setServiceName(serviceName: string): string {
   return isStringOfLength(serviceName, 1, 999) ? serviceName : defaultSN;
 }
 
-function setTransports(): winston.transport[] {
+function setTransports(): transport[] {
   return [new winston.transports.Console()];
 } 
 
-function setFormat(timeZone: string, serviceName: string): winston.format {
-  const tz = setTimeZone(timeZone);
+function setFormat(tz: string, serviceName: string): Logform.Format {
+  const dateFormat = getFormatDate(tz);
   const sn = setServiceName(serviceName);
   const snLog = sn ? `${sn} ` : "";
   return winston.format.combine(
     winston.format.colorize({ all: true }),
-    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss:ms", tz }),
+    winston.format.timestamp({ format: dateFormat }),
     winston.format.align(),
+    // winston.format.label({ label: 'right meow!' }),
+    // winston.format.cli(),
+    // winston.format.prettyPrint(),
     winston.format.printf(
-      (info: winston.Logform.TransformableInfo) =>
-        `[${info.timestamp}] - ${snLog}${info.level}: ${info.message
-          ?.replace(/[\n\r]+/g, "")
-          .replace(/\s{2,}/g, " ")}`,
-    ),
+      (info: Logform.TransformableInfo) => {
+        const msg = info.message
+          ?.toString()
+           .replace(/[\n\r]+/g, "")
+           .replace(/\s{2,}/g, " ");
+        return `[${info.timestamp}] - ${snLog}${info.level}: ${msg}`;
+    }),
   );
 }
 
-function initLogger(timeZone: string, serviceName: string, level: Levels): void {
-  lvl = isCustomType(level, levels) ? level : lvl;
-  format = setFormat(timeZone, serviceName);
+function init(timeZone: string, serviceName: string, level: Levels): void {
+  lvl = isProperty(level, levels) ? level : lvl;
+  fmt = setFormat(timeZone, serviceName);
 }
 
-const log = (): winston.Logger => {
-  return winston.createLogger({ lvl, levels, format, transports });
+const log = (): Logger => {
+  return winston.createLogger({ 
+    level:lvl, 
+    silent: false,
+    format: fmt, 
+    levels, 
+    transports: tpts
+  });
 }
 
 export {
-  initLogger, 
+  init, 
   log,
 }
 

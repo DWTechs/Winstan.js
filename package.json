@@ -36,11 +36,9 @@
   ],
   "dependencies": {
     "@dwtechs/checkard": "2.28.0",
-    "winston": "3.11.0"
+    "winston": "3.17.0"
   },
   "devDependencies": {
-    "@rollup/plugin-babel": "6.0.4",
-    "@rollup/plugin-commonjs": "28.0.1",
     "@rollup/plugin-node-resolve": "15.3.0",
     "@types/node": "22.10.1",
     "core-js": "3.38.1",

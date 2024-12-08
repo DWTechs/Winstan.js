@@ -10,7 +10,9 @@ const config =  {
   external: [
   ],
   plugins: [
-    resolve(),
+    resolve({
+      mainFields: ['module', 'main']
+    }),
   ]
 };
 

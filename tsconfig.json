@@ -3,7 +3,7 @@
     "module": "ES6",
     "moduleResolution": "node",
     "target": "ES6",
-    "lib": ["es2019"],
+    "lib": ["dom", "es2019"],
     "sourceMap": false,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -17,7 +17,7 @@
     "suppressImplicitAnyIndexErrors": false,
     "allowJs": false,
     "removeComments": true,
-    "declaration": true,
+    "declaration": false,
     "outDir": "build/es6/",
     "rootDir": "src/"
   },
