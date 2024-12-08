@@ -17,7 +17,7 @@ const files   = [
   },
   {
     src:  `${src}winstan.mjs`,
-    dest: `${dest}winstan.mjs`
+    dest: `${dest}winstan.js`
   },
 ];
 
