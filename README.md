@@ -9,7 +9,6 @@
 - [Installation](#installation)
 - [Usage](#usage)
   - [ES6](#es6)
-  - [CommonJS](#commonjs)
 - [Configure](#configure)
 - [API Reference](#api-reference)
 - [Contributors](#contributors)
@@ -49,6 +48,7 @@ $ npm i @dwtechs/winstan
 
 ```javascript
 import { log } from "@dwtechs/winstan";
+// or const log = require("@dwtechs/winstan");
 
 log.error(`App cannot start: ${err.msg}`);
 log.info(`App started on port : ${PORT}`);
@@ -56,17 +56,6 @@ log.debug(`UpdateOne(user=${JSON.stringify(users)})`);
 
 ```
 
-### CommonJS
-
-```javascript
-
-const log = require("@dwtechs/winstan");
-
-log.error(`App cannot start: ${err.msg}`);
-log.info(`App started on port : ${PORT}`);
-log.debug(`UpdateOne(user=${JSON.stringify(users)})`);
-
-```
 
 ### Levels
 
@@ -84,6 +73,7 @@ Winstan will start with the following default configuration :
 ```Javascript
   let defaultSN = "";
   let defaultTZ = "europe/paris";
+  let defaultLocale = "fr-FR"
   let defaultNodeEnv = "development";
 ```
 
@@ -93,12 +83,13 @@ It is useful in a multi-service or multi-application monitoring tool.
 
 You can configure Winstan using 2 methods :
 
-### TZ, NODE_ENV and SERVICE_NAME environment variables
+### Environment variables
 
-Those three environment variables are looked up at start-up : 
+Four environment variables are looked up at start-up : 
 
 example : 
 ```bash
+  LOCALE="en-EN"
   TZ="UTC"
   NODE_ENV="production"
   SERVICE_NAME="ms_user"

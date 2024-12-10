@@ -11,10 +11,10 @@ const files   = [
     src:  `${rel}src/winstan.d.ts`,
     dest: `${dest}winstan.d.ts`
   },
-  {
-    src:  `${src}winstan.cjs.js`,
-    dest: `${dest}winstan.cjs.js`
-  },
+  // {
+  //   src:  `${src}winstan.cjs.js`,
+  //   dest: `${dest}winstan.cjs.js`
+  // },
   {
     src:  `${src}winstan.mjs`,
     dest: `${dest}winstan.js`
