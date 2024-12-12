@@ -22,8 +22,8 @@
 - Only 1 small dependency to check inputs variables
 - Very lightweight
 - Thoroughly tested
-- Works in Javascript, Typescript and Node.js
-- Can be used as CommonJS or EcmaScrypt module
+- Works in Javascript, Typescript
+- Can be used as EcmaScrypt module
 - Written in Typescript
 
 
@@ -85,7 +85,7 @@ You can configure Winstan using 2 methods :
 
 ### Environment variables
 
-Four environment variables are looked up at start-up : 
+Four environment variables may be used by Winstan : 
 
 example : 
 ```bash
@@ -97,19 +97,19 @@ example :
 
 Possible values for **NODE_ENV** are "production" and "prod".
 Those values will set Winstan log level to **info**.
-Any other value (like "dev" or "development") will set Winstan log level to **debug**
+Any other value (like "dev" or "development") will set the log level to **debug**
 
-**TZ** is the usual timezone configuration in order to set logs time to your region.
+**TZ** is the timezone configuration to set time to your region.
 
-### initLogger()
+### init() method
 
 This method will override ENV variables.
 
 ```javascript
 
-import { log, initLogger } from "@dwtechs/winstan";
+import { log, init } from "@dwtechs/winstan";
 
-initLogger("UTC", "ms_user", "debug");
+init("UTC", "fr-FR", "ms_user", "debug");
 
 ```
 
@@ -121,7 +121,7 @@ initLogger("UTC", "ms_user", "debug");
 
 export type Levels = 'error'|'warn'|'info'|'debug';
 
-initLogger(timeZone: string, serviceName: string, nodeEnv: string): void {}
+init(timeZone: string, locale: string, serviceName: string, nodeEnv: string): void {}
 
 log(size: number): number {}
 

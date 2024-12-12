@@ -33,7 +33,7 @@ const levels = {
 // winston.addColors(colors);
 
 let lvl: Levels = defaultLvl;
-let fmt = setFormat(defaultTZ, "serviceName");
+let fmt = setFormat(defaultTZ, defaultLocale, "serviceName");
 const tpts = setTransports();
 
 // YYYY-MM-DD HH:mm:ss:ms
@@ -41,7 +41,7 @@ function getTimezonedDate(timeZone: string): string {
   return new Date().toLocaleString(defaultLocale, { timeZone });
 }
 
-function getFormatDate(timeZone: string): string { 
+function setDateFormat(timeZone: string, locale: string): string { 
   return isStringOfLength(timeZone, 2, 999) ? getTimezonedDate(timeZone) : getTimezonedDate(defaultTZ);
 }
 
@@ -53,8 +53,8 @@ function setTransports(): transport[] {
   return [new winston.transports.Console()];
 } 
 
-function setFormat(tz: string, serviceName: string): Logform.Format {
-  const dateFormat = getFormatDate(tz);
+function setFormat(tz: string, locale: string, serviceName: string): Logform.Format {
+  const dateFormat = setDateFormat(tz, locale);
   const sn = setServiceName(serviceName);
   const snLog = sn ? `${sn} ` : "";
   return winston.format.combine(
@@ -75,9 +75,9 @@ function setFormat(tz: string, serviceName: string): Logform.Format {
   );
 }
 
-function init(timeZone: string, serviceName: string, level: Levels): void {
+function init(timeZone: string, locale: string, serviceName: string, level: Levels): void {
   lvl = isProperty(level, levels) ? level : lvl;
-  fmt = setFormat(timeZone, serviceName);
+  fmt = setFormat(timeZone, locale, serviceName);
 }
 
 const log = (): Logger => {
