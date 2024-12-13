@@ -116,8 +116,13 @@ This method will override ENV variables.
 ```javascript
 
 import { log, init } from "@dwtechs/winstan";
-
-init("UTC", "fr-FR", "ms_user", "debug");
+const options = {
+  timeZone: "UTC",
+  locale: "fr-FR",
+  serviceName: "ms_user",
+  level: "debug"
+}
+init(options);
 log.info(`App started on port : ${PORT}`);
 
 ```
