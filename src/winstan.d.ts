@@ -1,6 +1,12 @@
-import type { Logger } from "winston";
+import type { Logger, Logform } from "winston";
 export type Levels = 'error' | 'warn' | 'info' | 'debug';
-declare function init(timeZone: string, serviceName: string, level: Levels): void;
+export type Options = {
+  timeZone: string;
+  locale: string;
+  serviceName: string;
+  level: Levels; 
+};
+declare function init(options: Options): Logform.Format;
 declare const log: () => Logger;
 
 export { 

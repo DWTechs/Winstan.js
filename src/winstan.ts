@@ -1,9 +1,9 @@
-import type { Levels } from "./types";
+import type { Levels, Options } from "./types";
 import type { Logform, Logger, transport } from "winston";
 import * as winston from "winston";
 import { isStringOfLength, isProperty } from "@dwtechs/checkard";
 
-let defaultSN = "serviceName";
+let defaultSN = "";
 let defaultLocale = "fr-FR";
 let defaultTZ = "europe/paris";
 let defaultNodeEnv = "development";
@@ -32,17 +32,19 @@ const levels = {
 // };
 // winston.addColors(colors);
 
+// Init logger with default Values
 let lvl: Levels = defaultLvl;
-let fmt = setFormat(defaultTZ, defaultLocale, "serviceName");
 const tpts = setTransports();
-
-// YYYY-MM-DD HH:mm:ss:ms
-function getTimezonedDate(timeZone: string): string {
-  return new Date().toLocaleString(defaultLocale, { timeZone });
-}
+let fmt = init({ timeZone: defaultTZ, 
+                 locale: defaultLocale, 
+                 serviceName: defaultSN,
+                 level: defaultLvl 
+              });
 
 function setDateFormat(timeZone: string, locale: string): string { 
-  return isStringOfLength(timeZone, 2, 999) ? getTimezonedDate(timeZone) : getTimezonedDate(defaultTZ);
+  timeZone = isStringOfLength(timeZone, 2, 999) ? timeZone : defaultTZ;
+  locale = isStringOfLength(locale, 5, 5) ? locale : defaultLocale;  
+  return new Date().toLocaleString(locale, { timeZone });
 }
 
 function setServiceName(serviceName: string): string {
@@ -53,13 +55,11 @@ function setTransports(): transport[] {
   return [new winston.transports.Console()];
 } 
 
-function setFormat(tz: string, locale: string, serviceName: string): Logform.Format {
-  const dateFormat = setDateFormat(tz, locale);
-  const sn = setServiceName(serviceName);
-  const snLog = sn ? `${sn} ` : "";
+function setFormat(format: string, serviceName: string): Logform.Format {
+  const snLog = serviceName ? `${serviceName} ` : "";
   return winston.format.combine(
     winston.format.colorize({ all: true }),
-    winston.format.timestamp({ format: dateFormat }),
+    winston.format.timestamp({ format }), // YYYY-MM-DD HH:mm:ss:ms
     winston.format.align(),
     // winston.format.label({ label: 'right meow!' }),
     // winston.format.cli(),
@@ -75,9 +75,11 @@ function setFormat(tz: string, locale: string, serviceName: string): Logform.For
   );
 }
 
-function init(timeZone: string, locale: string, serviceName: string, level: Levels): void {
-  lvl = isProperty(level, levels) ? level : lvl;
-  fmt = setFormat(timeZone, locale, serviceName);
+function init(options: Options): Logform.Format {
+  lvl = isProperty(options.level, levels) ? options.level : lvl;
+  const dateFormat = setDateFormat(options.timeZone, options.locale);
+  const sn = setServiceName(options.serviceName);
+  return setFormat(dateFormat, sn);
 }
 
 const log = (): Logger => {

@@ -87,7 +87,8 @@ You can configure Winstan using 2 methods :
 
 Four environment variables may be used by Winstan : 
 
-example : 
+example :
+
 ```bash
   LOCALE="en-EN"
   TZ="UTC"
@@ -95,9 +96,16 @@ example :
   SERVICE_NAME="ms_user"
 ```
 
-Possible values for **NODE_ENV** are "production" and "prod".
-Those values will set Winstan log level to **info**.
-Any other value (like "dev" or "development") will set the log level to **debug**
+These environment variables will update the default values of the lib at start up.
+So you do not need to init the library in the code.
+
+```javascript
+
+import { log, init } from "@dwtechs/winstan";
+
+log.info(`App started on port : ${PORT}`);
+
+```
 
 **TZ** is the timezone configuration to set time to your region.
 
@@ -110,8 +118,15 @@ This method will override ENV variables.
 import { log, init } from "@dwtechs/winstan";
 
 init("UTC", "fr-FR", "ms_user", "debug");
+log.info(`App started on port : ${PORT}`);
 
 ```
+
+### Production mode
+
+Possible values for **NODE_ENV** environment variable are "production" and "prod".
+Those values will set Winstan log level to **info**.
+Any other value (like "dev" or "development") will set the log level to **debug**
 
 
 ## API Reference
@@ -121,7 +136,14 @@ init("UTC", "fr-FR", "ms_user", "debug");
 
 export type Levels = 'error'|'warn'|'info'|'debug';
 
-init(timeZone: string, locale: string, serviceName: string, nodeEnv: string): void {}
+export type Options = {
+  timeZone: string;
+  locale: string;
+  serviceName: string;
+  level: Levels; 
+};
+
+init(options: Options): void {}
 
 log(size: number): number {}
 
