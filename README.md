@@ -101,7 +101,7 @@ So you do not need to init the library in the code.
 
 ```javascript
 
-import { log, init } from "@dwtechs/winstan";
+import { log } from "@dwtechs/winstan";
 
 log.info(`App started on port : ${PORT}`);
 
