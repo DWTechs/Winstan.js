@@ -137,10 +137,10 @@ Any other value (like "dev" or "development") will set the log level to **debug*
 export type Levels = 'error'|'warn'|'info'|'debug';
 
 export type Options = {
-  timeZone: string;
-  locale: string;
-  serviceName: string;
-  level: Levels; 
+  timeZone: string,
+  locale: string,
+  serviceName: string,
+  level: Levels
 };
 
 init(options: Options): void {}
