@@ -1,7 +1,7 @@
 {
   "name": "@dwtechs/winstan",
   "version": "0.1.0",
-  "description": "Open source arrays toolkit library for Javascript.",
+  "description": "Open source Winston setup wrapper library for easier logging with less code.",
   "keywords": [
     "logs", "logger", "winston"
   ],

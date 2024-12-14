@@ -17,7 +17,7 @@
 
 ## Synopsis
 
-**[Winstan.js](https://github.com/DWTechs/Winstan.js)** is an Open source arrays toolkit library for Javascript.
+**[Winstan.js](https://github.com/DWTechs/Winstan.js)** is an Open source Winston setup wrapper library for easier logging with less code.
 
 - Only 1 small dependency to check inputs variables
 - Very lightweight
