@@ -1,6 +1,6 @@
 import type { Levels, Options } from "./types";
 import type { Logform, transport } from "winston";
-import * as winston from "winston";
+import winston from "winston";
 import { isStringOfLength, isProperty } from "@dwtechs/checkard";
 
 let defaultSN = "";

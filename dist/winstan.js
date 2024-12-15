@@ -24,7 +24,7 @@ SOFTWARE.
 https://github.com/DWTechs/Winstan.js
 */
 
-import * as winston from 'winston';
+import winston from 'winston';
 import { isProperty, isStringOfLength } from '@dwtechs/checkard';
 
 let defaultSN = "";

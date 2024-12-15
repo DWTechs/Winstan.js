@@ -48,7 +48,6 @@ $ npm i @dwtechs/winstan
 
 ```javascript
 import { log } from "@dwtechs/winstan";
-// or const log = require("@dwtechs/winstan");
 
 log.error(`App cannot start: ${err.msg}`);
 log.info(`App started on port : ${PORT}`);
