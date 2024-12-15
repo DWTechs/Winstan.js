@@ -1,5 +1,5 @@
 import type { Levels, Options } from "./types";
-import type { Logform, Logger, transport } from "winston";
+import type { Logform, transport } from "winston";
 import * as winston from "winston";
 import { isStringOfLength, isProperty } from "@dwtechs/checkard";
 
@@ -24,13 +24,12 @@ const levels = {
   debug: 3,
 };
 
-// const colors = {
-//   error: "red",
-//   warn: "yellow",
-//   info: "green",
-//   debug: "white",
-// };
-// winston.addColors(colors);
+const colors = {
+  error: "red",
+  warn: "orange",
+  info: "blue",
+  debug: "green",
+};
 
 // Init logger with default Values
 let lvl: Levels = defaultLvl;
@@ -82,21 +81,20 @@ function init(options: Options): Logform.Format {
   return setFormat(dateFormat, sn);
 }
 
-const log = (): Logger => {
-  return winston.createLogger({ 
-    level:lvl, 
+const log = winston.createLogger({ 
+    level: lvl,
     silent: false,
-    format: fmt, 
-    levels, 
+    format: fmt,
+    levels,
     transports: tpts
   });
-}
+
+winston.addColors(colors);
 
 export {
   init, 
   log,
 }
-
 
 // const errors = [
 // 	{ code: 400, level: "warn", name: "Bad request" },

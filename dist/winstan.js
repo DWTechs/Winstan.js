@@ -45,6 +45,12 @@ const levels = {
     info: 2,
     debug: 3,
 };
+const colors = {
+    error: "red",
+    warn: "orange",
+    info: "blue",
+    debug: "green",
+};
 let lvl = defaultLvl;
 const tpts = setTransports();
 let fmt = init({ timeZone: defaultTZ,
@@ -77,14 +83,13 @@ function init(options) {
     const sn = setServiceName(options.serviceName);
     return setFormat(dateFormat, sn);
 }
-const log = () => {
-    return winston.createLogger({
-        level: lvl,
-        silent: false,
-        format: fmt,
-        levels,
-        transports: tpts
-    });
-};
+const log = winston.createLogger({
+    level: lvl,
+    silent: false,
+    format: fmt,
+    levels,
+    transports: tpts
+});
+winston.addColors(colors);
 
 export { init, log };
