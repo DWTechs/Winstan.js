@@ -107,9 +107,4 @@ var perf = {
     end,
 };
 
-var perf$1 = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    default: perf
-});
-
-export { init, log, perf$1 as perf };
+export { init, log, perf };

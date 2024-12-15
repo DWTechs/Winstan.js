@@ -1,2 +1,3 @@
 export { init, log } from './logger';
-export * as perf from './perf';
+import perf from './perf';
+export { perf };

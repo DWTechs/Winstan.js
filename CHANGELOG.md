@@ -1,3 +1,8 @@
+# 0.2.1 (Dec 17th 2024)
+
+- Fix perf middleware export
+
+
 # 0.2.0 (Dec 16th 2024)
 
 - Add performance logs for Express.js
