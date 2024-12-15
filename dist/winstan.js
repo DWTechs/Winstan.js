@@ -92,4 +92,24 @@ const log = winston.createLogger({
 });
 winston.addColors(colors);
 
-export { init, log };
+function start(req, _res, next) {
+    log.info(`Request started on ${req.method}${req.url}`);
+    req.perf = Date.now();
+    next();
+}
+function end(req, _res, next) {
+    const delta = req.perf ? Date.now() - req.perf : 0;
+    log.info(`Request ended on ${req.method}${req.url} in ${delta}ms`);
+    next();
+}
+var perf = {
+    start,
+    end,
+};
+
+var perf$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    default: perf
+});
+
+export { init, log, perf$1 as perf };

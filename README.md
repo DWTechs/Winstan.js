@@ -153,6 +153,27 @@ log(size: number): number {}
 
 ```
 
+
+## Express.js utilities
+
+The library comes with a few utilities for Express.js services.
+
+### Performances measurement
+
+```javascript
+import express from "express";
+import { perf } from '@dwtechs/winstan';
+
+const app = express();
+app.use(express.json());
+// performance measurement starts for any call to the following routes
+app.use(perf.start);
+app.use("/", route);
+// Performance measurement ends
+app.use(perf.end);
+```
+
+
 ## Contributors
 
 Winstan.js is still in development and we would be glad to get all the help you can provide.
