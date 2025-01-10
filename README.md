@@ -154,15 +154,25 @@ log(size: number): number {}
 ```
 
 
-## Express.js utilities
+## Express.js plugin
 
-The library comes with a few utilities for Express.js services.
+Winstan comes with a utility plugin for Express.js.
 
 ### Performances measurement
 
+This plugin will log the time it took to process a request.
+
+#### Installation
+
+```bash
+$ npm i @dwtechs/winstan-plugin-express-perf
+```
+
+#### Usage
+
 ```javascript
 import express from "express";
-import { perf } from '@dwtechs/winstan';
+import { perf } from '@dwtechs/winstan-plugin-express-perf';
 
 const app = express();
 app.use(express.json());

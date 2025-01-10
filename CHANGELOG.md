@@ -1,3 +1,8 @@
+# 0.3.0 (Dec 10th 2025)
+
+- perf Express middleware is now a npm plugin : @dwtechs/winstan-plugin-express-perf 
+
+
 # 0.2.1 (Dec 17th 2024)
 
 - Fix perf middleware export
