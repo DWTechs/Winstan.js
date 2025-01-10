@@ -53,7 +53,7 @@ const colors = {
 };
 let lvl = defaultLvl;
 const tpts = setTransports();
-let fmt = init({ timeZone: defaultTZ,
+const fmt = init({ timeZone: defaultTZ,
     locale: defaultLocale,
     serviceName: defaultSN,
     level: defaultLvl
@@ -92,19 +92,4 @@ const log = winston.createLogger({
 });
 winston.addColors(colors);
 
-function start(req, _res, next) {
-    log.info(`Request started on ${req.method}${req.url}`);
-    req.perf = Date.now();
-    next();
-}
-function end(req, _res, next) {
-    const delta = req.perf ? Date.now() - req.perf : 0;
-    log.info(`Request ended on ${req.method}${req.url} in ${delta}ms`);
-    next();
-}
-var perf = {
-    start,
-    end,
-};
-
-export { init, log, perf };
+export { init, log };
