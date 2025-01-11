@@ -1,6 +1,11 @@
-# 0.3.0 (Dec 10th 2025)
+# 0.3.1 (Jan 11th 2025)
 
-- perf Express middleware is now a npm plugin : @dwtechs/winstan-plugin-express-perf 
+- Update @dwtechs/checkard dependency to 2.29.2 
+
+
+# 0.3.0 (Jan 10th 2025)
+
+- Perf Express middleware is now a npm plugin : @dwtechs/winstan-plugin-express-perf 
 
 
 # 0.2.1 (Dec 17th 2024)
