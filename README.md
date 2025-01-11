@@ -22,14 +22,14 @@
 - Only 1 small dependency to check inputs variables
 - Very lightweight
 - Thoroughly tested
-- Works in Javascript, Typescript
+- Works in Javascript and Typescript
 - Can be used as EcmaScrypt module
 - Written in Typescript
 
 
 ## Support
 
-- node: 16
+- node: 22
 
 This is the oldest targeted versions. The library should work properly on older versions of Node.js but we do not support it officially.  
 
@@ -172,7 +172,7 @@ $ npm i @dwtechs/winstan-plugin-express-perf
 
 ```javascript
 import express from "express";
-import { perf } from '@dwtechs/winstan-plugin-express-perf';
+import perf from '@dwtechs/winstan-plugin-express-perf';
 
 const app = express();
 app.use(express.json());
