@@ -53,24 +53,25 @@ const colors = {
 };
 let lvl = defaultLvl;
 const tpts = setTransports();
-const fmt = init({ timeZone: defaultTZ,
+const fmt = init({
+    timeZone: defaultTZ,
     locale: defaultLocale,
-    serviceName: defaultSN,
+    service: defaultSN,
     level: defaultLvl
 });
 function setDateFormat(timeZone, locale) {
-    timeZone = isStringOfLength(timeZone, 2, 999) ? timeZone : defaultTZ;
-    locale = isStringOfLength(locale, 5, 5) ? locale : defaultLocale;
-    return new Date().toLocaleString(locale, { timeZone });
+    const tz = isStringOfLength(timeZone, 2, 999) ? timeZone : defaultTZ;
+    const l = isStringOfLength(locale, 5, 5) ? locale : defaultLocale;
+    return new Date().toLocaleString(l, { timeZone: tz });
 }
-function setServiceName(serviceName) {
-    return isStringOfLength(serviceName, 1, 999) ? serviceName : defaultSN;
+function setServiceName(service) {
+    return isStringOfLength(service, 1, 999) ? service : defaultSN;
 }
 function setTransports() {
     return [new winston.transports.Console()];
 }
-function setFormat(format, serviceName) {
-    const snLog = serviceName ? `${serviceName} ` : "";
+function setFormat(format, service) {
+    const snLog = service ? `${service} ` : "";
     return winston.format.combine(winston.format.colorize({ all: true }), winston.format.timestamp({ format }), winston.format.align(), winston.format.printf((info) => {
         var _a;
         const msg = (_a = info.message) === null || _a === void 0 ? void 0 : _a.toString().replace(/[\n\r]+/g, "").replace(/\s{2,}/g, " ");
@@ -80,7 +81,7 @@ function setFormat(format, serviceName) {
 function init(options) {
     lvl = isProperty(options.level, levels) ? options.level : lvl;
     const dateFormat = setDateFormat(options.timeZone, options.locale);
-    const sn = setServiceName(options.serviceName);
+    const sn = setServiceName(options.service);
     return setFormat(dateFormat, sn);
 }
 const log = winston.createLogger({

@@ -118,7 +118,7 @@ import { log, init } from "@dwtechs/winstan";
 const options = {
   timeZone: "UTC",
   locale: "fr-FR",
-  serviceName: "ms_user",
+  service: "ms_user",
   level: "debug"
 }
 init(options);
@@ -143,7 +143,7 @@ export type Levels = 'error'|'warn'|'info'|'debug';
 export type Options = {
   timeZone: string;
   locale: string;
-  serviceName: string;
+  service: string;
   level: Levels;
 };
 

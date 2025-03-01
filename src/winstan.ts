@@ -34,28 +34,29 @@ const colors = {
 // Init logger with default Values
 let lvl: Levels = defaultLvl;
 const tpts = setTransports();
-const fmt = init({ timeZone: defaultTZ, 
-                 locale: defaultLocale, 
-                 serviceName: defaultSN,
-                 level: defaultLvl 
-              });
+const fmt = init({ 
+  timeZone: defaultTZ, 
+  locale: defaultLocale, 
+  service: defaultSN,
+  level: defaultLvl 
+});
 
 function setDateFormat(timeZone: string, locale: string): string { 
-  timeZone = isStringOfLength(timeZone, 2, 999) ? timeZone : defaultTZ;
-  locale = isStringOfLength(locale, 5, 5) ? locale : defaultLocale;  
-  return new Date().toLocaleString(locale, { timeZone });
+  const tz = isStringOfLength(timeZone, 2, 999) ? timeZone : defaultTZ;
+  const l = isStringOfLength(locale, 5, 5) ? locale : defaultLocale;  
+  return new Date().toLocaleString(l, { timeZone: tz });
 }
 
-function setServiceName(serviceName: string): string {
-  return isStringOfLength(serviceName, 1, 999) ? serviceName : defaultSN;
+function setServiceName(service: string): string {
+  return isStringOfLength(service, 1, 999) ? service : defaultSN;
 }
 
 function setTransports(): transport[] {
   return [new winston.transports.Console()];
 } 
 
-function setFormat(format: string, serviceName: string): Logform.Format {
-  const snLog = serviceName ? `${serviceName} ` : "";
+function setFormat(format: string, service: string): Logform.Format {
+  const snLog = service ? `${service} ` : "";
   return winston.format.combine(
     winston.format.colorize({ all: true }),
     winston.format.timestamp({ format }), // YYYY-MM-DD HH:mm:ss:ms
@@ -77,7 +78,7 @@ function setFormat(format: string, serviceName: string): Logform.Format {
 function init(options: Options): Logform.Format {
   lvl = isProperty(options.level, levels) ? options.level : lvl;
   const dateFormat = setDateFormat(options.timeZone, options.locale);
-  const sn = setServiceName(options.serviceName);
+  const sn = setServiceName(options.service);
   return setFormat(dateFormat, sn);
 }
 
