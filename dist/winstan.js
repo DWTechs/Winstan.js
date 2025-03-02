@@ -25,20 +25,21 @@ https://github.com/DWTechs/Winstan.js
 */
 
 import winston from 'winston';
-import { isProperty, isStringOfLength } from '@dwtechs/checkard';
+import { isStringOfLength, isProperty, isString, isValidInteger } from '@dwtechs/checkard';
 
-let defaultSN = "";
+let defaultUser = "";
+let defaultService = "";
 let defaultLocale = "fr-FR";
 let defaultTZ = "europe/paris";
-let defaultNodeEnv = "development";
+let nodeEnv = "development";
 if (process === null || process === void 0 ? void 0 : process.env) {
-    const { LOCALE, TZ, NODE_ENV, SERVICE_NAME } = process.env;
+    const { LOCALE, TZ, NODE_ENV, SERVICE_NAME, SYSTEM_USER_NAME } = process.env;
     defaultLocale = LOCALE || defaultLocale;
     defaultTZ = TZ || defaultTZ;
-    defaultNodeEnv = NODE_ENV || defaultNodeEnv;
-    defaultSN = SERVICE_NAME || defaultSN;
+    nodeEnv = NODE_ENV || nodeEnv;
+    defaultService = SERVICE_NAME || defaultService;
+    defaultUser = SYSTEM_USER_NAME || defaultUser;
 }
-const defaultLvl = (defaultNodeEnv === "prod" || defaultNodeEnv === "production") ? "info" : "debug";
 const levels = {
     error: 0,
     warn: 1,
@@ -51,21 +52,30 @@ const colors = {
     info: "blue",
     debug: "green",
 };
-let lvl = defaultLvl;
+let displayedLevel = (nodeEnv === "prod" || nodeEnv === "production") ? "info" : "debug";
 const tpts = setTransports();
 const fmt = init({
     timeZone: defaultTZ,
     locale: defaultLocale,
-    service: defaultSN,
-    level: defaultLvl
+    service: defaultService,
+    level: displayedLevel
 });
 function setDateFormat(timeZone, locale) {
     const tz = isStringOfLength(timeZone, 2, 999) ? timeZone : defaultTZ;
     const l = isStringOfLength(locale, 5, 5) ? locale : defaultLocale;
     return new Date().toLocaleString(l, { timeZone: tz });
 }
-function setServiceName(service) {
-    return isStringOfLength(service, 1, 999) ? service : defaultSN;
+function setService(service) {
+    return isStringOfLength(service, 1, 99) ? service : defaultService;
+}
+function setUser(user) {
+    return ((isString(user) && isStringOfLength(user, 1, 99)) || isValidInteger(user, 1, 99)) ? `${user} - ` : defaultUser;
+}
+function setAction(action) {
+    return action ? `[${action}] ` : "";
+}
+function setLevel(lvl) {
+    return isProperty(levels, lvl) ? lvl : "debug";
 }
 function setTransports() {
     return [new winston.transports.Console()];
@@ -79,18 +89,40 @@ function setFormat(format, service) {
     }));
 }
 function init(options) {
-    lvl = isProperty(options.level, levels) ? options.level : lvl;
+    displayedLevel = setLevel(options.level);
     const dateFormat = setDateFormat(options.timeZone, options.locale);
-    const sn = setServiceName(options.service);
-    return setFormat(dateFormat, sn);
+    const service = setService(options.service);
+    return setFormat(dateFormat, service);
 }
-const log = winston.createLogger({
-    level: lvl,
+const logger = winston.createLogger({
+    level: displayedLevel,
     silent: false,
     format: fmt,
     levels,
     transports: tpts
 });
 winston.addColors(colors);
+function normalize(lvl, msg, user, action) {
+    if (!isString(msg, "!0"))
+        return;
+    const u = setUser(user);
+    const a = setAction(action);
+    const m = `${a}${u}${msg}`;
+    logger[lvl](m);
+}
+const log = {
+    error: (msg, user, action) => {
+        normalize('error', msg, user, action);
+    },
+    warn: (msg, user, action) => {
+        normalize('warn', msg, user, action);
+    },
+    info: (msg, user, action) => {
+        normalize('info', msg, user, action);
+    },
+    debug: (msg, user, action) => {
+        normalize('debug', msg, user, action);
+    }
+};
 
 export { init, log };

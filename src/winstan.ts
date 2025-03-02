@@ -1,22 +1,29 @@
 import type { Levels, Options } from "./types";
 import type { Logform, transport } from "winston";
 import winston from "winston";
-import { isStringOfLength, isProperty } from "@dwtechs/checkard";
+import { 
+  isStringOfLength, 
+  isProperty, 
+  isValidInteger, 
+  isString 
+} from "@dwtechs/checkard";
 
-let defaultSN = "";
+let defaultUser = ""
+let defaultService = "";
 let defaultLocale = "fr-FR";
 let defaultTZ = "europe/paris";
-let defaultNodeEnv = "development";
+let nodeEnv = "development";
 
 // check for env variables
 if (process?.env) {
-  const { LOCALE, TZ, NODE_ENV, SERVICE_NAME } = process.env;
+  const { LOCALE, TZ, NODE_ENV, SERVICE_NAME, SYSTEM_USER_NAME } = process.env;
   defaultLocale = LOCALE || defaultLocale;
   defaultTZ = TZ || defaultTZ;
-  defaultNodeEnv = NODE_ENV || defaultNodeEnv;
-  defaultSN = SERVICE_NAME || defaultSN;
+  nodeEnv = NODE_ENV || nodeEnv;
+  defaultService = SERVICE_NAME || defaultService;
+  defaultUser = SYSTEM_USER_NAME || defaultUser;
 }
-const defaultLvl = (defaultNodeEnv === "prod" || defaultNodeEnv === "production") ? "info" : "debug";
+
 const levels = {
   error: 0,
   warn: 1,
@@ -32,13 +39,13 @@ const colors = {
 };
 
 // Init logger with default Values
-let lvl: Levels = defaultLvl;
+let displayedLevel: Levels = (nodeEnv === "prod" || nodeEnv === "production") ? "info" : "debug";
 const tpts = setTransports();
 const fmt = init({ 
   timeZone: defaultTZ, 
   locale: defaultLocale, 
-  service: defaultSN,
-  level: defaultLvl 
+  service: defaultService,
+  level: displayedLevel 
 });
 
 function setDateFormat(timeZone: string, locale: string): string { 
@@ -47,8 +54,20 @@ function setDateFormat(timeZone: string, locale: string): string {
   return new Date().toLocaleString(l, { timeZone: tz });
 }
 
-function setServiceName(service: string): string {
-  return isStringOfLength(service, 1, 999) ? service : defaultSN;
+function setService(service: string): string {
+  return isStringOfLength(service, 1, 99) ? service : defaultService;
+}
+
+function setUser(user: string | number): string | number {
+  return ((isString(user) && isStringOfLength(user, 1, 99)) || isValidInteger(user, 1, 99)) ? `${user} - ` : defaultUser;
+}
+
+function setAction(action: string): string {
+  return action ? `[${action}] ` : "";
+}
+
+function setLevel(lvl: Levels): Levels {
+  return isProperty(levels, lvl) ? lvl : "debug";
 }
 
 function setTransports(): transport[] {
@@ -76,14 +95,14 @@ function setFormat(format: string, service: string): Logform.Format {
 }
 
 function init(options: Options): Logform.Format {
-  lvl = isProperty(options.level, levels) ? options.level : lvl;
+  displayedLevel = setLevel(options.level);
   const dateFormat = setDateFormat(options.timeZone, options.locale);
-  const sn = setServiceName(options.service);
-  return setFormat(dateFormat, sn);
+  const service = setService(options.service);
+  return setFormat(dateFormat, service);
 }
 
-const log = winston.createLogger({ 
-    level: lvl,
+const logger = winston.createLogger({ 
+    level: displayedLevel,
     silent: false,
     format: fmt,
     levels,
@@ -91,6 +110,30 @@ const log = winston.createLogger({
   });
 
 winston.addColors(colors);
+
+function normalize(lvl: Levels, msg: string, user: string | number, action: string ): void{
+  if (!isString(msg, "!0"))
+    return;
+  const u = setUser(user);
+  const a = setAction(action);
+  const m = `${a}${u}${msg}`;
+  logger[lvl](m);
+}
+
+const log = {
+  error: (msg: string, user: string | number, action: string ) => {
+    normalize('error', msg, user, action);
+  },
+  warn: (msg: string, user: string | number, action: string ) => {
+    normalize('warn', msg, user, action);
+  },
+  info: (msg: string, user: string | number, action: string ) => {
+    normalize('info', msg, user, action);
+  },
+  debug: (msg: string, user: string | number, action: string ) => {
+    normalize('debug', msg, user, action);
+  }
+};
 
 export {
   init, 
