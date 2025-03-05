@@ -36,7 +36,7 @@
     "dist/"
   ],
   "dependencies": {
-    "@dwtechs/checkard": "3.2.2",
+    "@dwtechs/checkard": "3.2.3",
     "winston": "3.17.0"
   },
   "devDependencies": {

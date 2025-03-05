@@ -111,16 +111,16 @@ function normalize(lvl, msg, user, action) {
     logger[lvl](m);
 }
 const log = {
-    error: (msg, user, action) => {
+    error: (msg, user = defaultUser, action = "") => {
         normalize('error', msg, user, action);
     },
-    warn: (msg, user, action) => {
+    warn: (msg, user = defaultUser, action = "") => {
         normalize('warn', msg, user, action);
     },
-    info: (msg, user, action) => {
+    info: (msg, user = defaultUser, action = "") => {
         normalize('info', msg, user, action);
     },
-    debug: (msg, user, action) => {
+    debug: (msg, user = defaultUser, action = "") => {
         normalize('debug', msg, user, action);
     }
 };

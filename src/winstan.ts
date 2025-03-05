@@ -58,11 +58,11 @@ function setService(service: string): string {
   return isStringOfLength(service, 1, 99) ? service : defaultService;
 }
 
-function setUser(user: string | number): string | number {
+function setUser(user: string | number | undefined): string | number {
   return ((isString(user) && isStringOfLength(user, 1, 99)) || isValidInteger(user, 1, 99)) ? `${user} - ` : defaultUser;
 }
 
-function setAction(action: string): string {
+function setAction(action: string | number | undefined): string {
   return action ? `[${action}] ` : "";
 }
 
@@ -111,7 +111,7 @@ const logger = winston.createLogger({
 
 winston.addColors(colors);
 
-function normalize(lvl: Levels, msg: string, user: string | number, action: string ): void{
+function normalize(lvl: Levels, msg: string, user: string | number | undefined, action: string | undefined ): void{
   if (!isString(msg, "!0"))
     return;
   const u = setUser(user);
@@ -121,16 +121,16 @@ function normalize(lvl: Levels, msg: string, user: string | number, action: stri
 }
 
 const log = {
-  error: (msg: string, user: string | number, action: string ) => {
+  error: (msg: string, user: string | number | undefined = defaultUser, action: string | undefined = "" ) => {
     normalize('error', msg, user, action);
   },
-  warn: (msg: string, user: string | number, action: string ) => {
+  warn: (msg: string, user: string | number | undefined = defaultUser, action: string | undefined = "" ) => {
     normalize('warn', msg, user, action);
   },
-  info: (msg: string, user: string | number, action: string ) => {
+  info: (msg: string, user: string | number | undefined = defaultUser, action: string | undefined = "" ) => {
     normalize('info', msg, user, action);
   },
-  debug: (msg: string, user: string | number, action: string ) => {
+  debug: (msg: string, user: string | number | undefined = defaultUser, action: string | undefined = "" ) => {
     normalize('debug', msg, user, action);
   }
 };
