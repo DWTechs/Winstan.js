@@ -58,7 +58,7 @@ log.debug(`UpdateOne(user=${JSON.stringify(users)})`);
 
 ### Levels
 
-Winstan reduces log levels to four : 
+Winstan uses four log levels : 
   - error,
   - warn,
   - info,
@@ -70,15 +70,18 @@ Winstan reduces log levels to four :
 Winstan will start with the following default configuration : 
 
 ```Javascript
-  let defaultSN = "";
-  let defaultTZ = "europe/paris";
-  let defaultLocale = "fr-FR"
-  let defaultNodeEnv = "development";
+  let locale = "fr-FR";
+  let timeZone = "europe/paris";
+  let level = "debug";
 ```
 
-**DefaultSN** is the service name. (Or the application name)
+**DefaultService** is the service name. (Or the application name)
 If provided, it will appear at the beginning of every log.
 It is useful in a multi-service or multi-application monitoring tool.
+
+**defaultUser** is the user name or id.
+If provided, it will appear in the message of the log.
+It is useful to know who made the action in a monitoring tool.
 
 You can configure Winstan using 2 methods :
 
@@ -115,13 +118,13 @@ This method will override ENV variables.
 ```javascript
 
 import { log, init } from "@dwtechs/winstan";
-const options = {
+
+init( 
   timeZone: "UTC",
   locale: "fr-FR",
   service: "ms_user",
   level: "debug"
-}
-init(options);
+);
 log.info(`App started on port : ${PORT}`);
 
 ```
@@ -140,48 +143,66 @@ Any other value (like "dev" or "development") will set the log level to **debug*
 
 export type Levels = 'error'|'warn'|'info'|'debug';
 
-export type Options = {
-  timeZone: string;
-  locale: string;
-  service: string;
-  level: Levels;
+function init(
+  timeZone: string, // timezone for date and time. Default to europe/paris
+  locale: string, // locale for date and time. Default to fr-FR
+  service: string, // service name. Default to empty string
+  level: Levels // minimum level to log. default to debug): Logform.Format;
+): Logform.Format;
+
+const log: {
+  error: (
+    msg: string,
+    id?: string | number | undefined,
+    user?: string | number | undefined,
+    tag?: string | undefined
+  ) => void;
+  warn: (
+    msg: string,
+    id?: string | number | undefined,
+    user?: string | number | undefined,
+    tag?: string | undefined
+  ) => void;
+  info: (
+    msg: string,
+    id?: string | number | undefined,
+    user?: string | number | undefined,
+    tag?: string | undefined
+  ) => void;
+  debug: (
+    msg: string,
+    id?: string | number | undefined,
+    user?: string | number | undefined,
+    tag?: string | undefined
+  ) => void;
 };
 
-init(options: Options): void {}
-
-log(size: number): number {}
-
 ```
 
+### Id
 
-## Express.js plugin
+IDs are often used to uniquely identify requests, sessions, or other entities. Displaying IDs in logs helps in tracing and debugging by providing a way to correlate log entries with specific entities or events.
 
-Winstan comes with a utility plugin for Express.js.
+### User
 
-### Performances measurement
+User is the name or id of the user who made the action. It is optional and can be used to filter logs in a monitoring tool.
 
+### Tags
+
+Tags are a way to categorize logs. They are optional and can be used to filter logs in a monitoring tool.
+They can be used categorize logs by action, by module, etc.
+
+
+## Express.js plugins
+
+Winstan comes with utility plugins for Express.js.
+
+### winstan-plugin-express-perf
+
+Performances measurement plugin for Express.js.
 This plugin will log the time it took to process a request.
 
-#### Installation
-
-```bash
-$ npm i @dwtechs/winstan-plugin-express-perf
-```
-
-#### Usage
-
-```javascript
-import express from "express";
-import perf from '@dwtechs/winstan-plugin-express-perf';
-
-const app = express();
-app.use(express.json());
-// performance measurement starts for any call to the following routes
-app.use(perf.start);
-app.use("/", route);
-// Performance measurement ends
-app.use(perf.end);
-```
+[https://www.npmjs.com/package/@dwtechs/winstan-plugin-express-perf](https://www.npmjs.com/package/@dwtechs/winstan-plugin-express-perf)
 
 
 ## Contributors

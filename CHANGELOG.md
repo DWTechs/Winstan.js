@@ -1,6 +1,7 @@
-# 0.3.1 (Jan 11th 2025)
+# 0.4.0 (Mar 08th 2025)
 
-- Update @dwtechs/checkard dependency to 2.29.2 
+- Add user, id and tags properties to the log object
+- Update @dwtechs/checkard dependency to 3.2.3 
 
 
 # 0.3.0 (Jan 10th 2025)
