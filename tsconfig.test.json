@@ -3,7 +3,7 @@
     "module": "ES6",
     "moduleResolution": "node",
     "target": "ES6",
-    "lib": ["dom", "es2019"],
+    "lib": ["dom", "es2016"],
     "sourceMap": false,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -17,9 +17,10 @@
     "suppressImplicitAnyIndexErrors": false,
     "allowJs": false,
     "removeComments": true,
-    "declaration": true,
-    "outDir": "build/es6/",
-    "rootDir": "src/"
+    "declaration": false,
+    "outDir": "tstests/",
+    "rootDir": "tstests/"
   },
+  "include": ["tstests/src/**/*"],
   "exclude": ["node_modules"]
 }

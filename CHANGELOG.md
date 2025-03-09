@@ -1,6 +1,6 @@
 # 0.4.0 (Mar 08th 2025)
 
-- Add user, id and tags properties to the log object
+- Add user, id and tags properties to the log function
 - Update @dwtechs/checkard dependency to 3.2.3 
 
 
