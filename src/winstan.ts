@@ -10,7 +10,7 @@ import {
   getFormat
 } from "./format.js";
 import { getLevels, getLevel, setLevel } from "./level";
-import { getColors } from "./color";
+// import { getColors } from "./color";
 
 let logger: winston.Logger;
 
@@ -38,14 +38,14 @@ const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = process?.env ?? null;
 setLevel((NODE_ENV === "prod" || NODE_ENV === "production") ? "info" : "debug");
 init(TZ, LOCALE, SERVICE_NAME, getLevel());
 
-winston.addColors(getColors());
+// winston.addColors(getColors());
 
 function print(
   lvl: Levels,
   msg: string,
-  id: string | number | undefined,
-  user: string | number | undefined,
-  tags: string[] | number[] | undefined
+  id?: string | number,
+  user?: string | number,
+  tags?: string[] | number[]
 ): void {
   if (!isString(msg, "!0"))
     return;
@@ -55,33 +55,34 @@ function print(
 const log = {
   error: (
     msg: string,
-    id?: string | number | undefined,
-    user?: string | number | undefined,
-    tags?: string[] | number[] | undefined
+    id?: string | number,
+    user?: string | number,
+    tags?: string[] | number[]
   ) => {
     print('error', msg, id, user, tags);
   },
   warn: (
     msg: string,
-    id?: string | number | undefined,
-    user?: string | number | undefined,
-    tags?: string[] | number[] | undefined
+    id?: string | number,
+    user?: string | number,
+    tags?: string[] | number[]
   ) => {
     print('warn', msg, id, user, tags);
   },
   info: (
     msg: string,
-    id?: string | number | undefined,
-    user?: string | number | undefined,
-    tags?: string[] | number[] | undefined
+    id?: string | number,
+    user?: string | number,
+    tags?: string[] | number[]
   ) => {
     print('info', msg, id, user, tags);
   },
   debug: (
     msg: string,
-    id?: string | number | undefined,
-    user?: string | number | undefined,
-    tags?: string[] | number[] | undefined) => {
+    id?: string | number,
+    user?: string | number,
+    tags?: string[] | number[]
+  ) => {
     print('debug', msg, id, user, tags);
   }
 };

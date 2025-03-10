@@ -27,14 +27,14 @@ https://github.com/DWTechs/Winstan.js
 import winston from 'winston';
 import { isString, isStringOfLength, isValidInteger, isArray, isProperty } from '@dwtechs/checkard';
 
+function normalizeId(id) {
+    return ((isString(id) && isStringOfLength(id, 1, 99)) || isValidInteger(id, 1, 99)) ? `id: ${id} - ` : "";
+}
 function normalizeUser(user) {
     return ((isString(user) && isStringOfLength(user, 1, 99)) || isValidInteger(user, 1, 99)) ? `user: ${user} - ` : "";
 }
 function normalizeTags(tags) {
     return isArray(tags, ">", 0) ? `[${tags.toString()}] ` : "";
-}
-function normalizeId(id) {
-    return ((isString(id) && isStringOfLength(id, 1, 99)) || isValidInteger(id, 1, 99)) ? `id: ${id} - ` : "";
 }
 function normalizeLog(msg, id, user, tags) {
     if (!isString(msg, "!0"))
@@ -87,16 +87,6 @@ function setLevel(lvl) {
     return level;
 }
 
-const colors = {
-    error: "red",
-    warn: "orange",
-    info: "blue",
-    debug: "green",
-};
-function getColors() {
-    return colors;
-}
-
 var _a;
 let logger;
 function init(timeZone, locale, service, level) {
@@ -115,7 +105,6 @@ function init(timeZone, locale, service, level) {
 const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = (_a = process === null || process === void 0 ? void 0 : process.env) !== null && _a !== void 0 ? _a : null;
 setLevel((NODE_ENV === "prod" || NODE_ENV === "production") ? "info" : "debug");
 init(TZ, LOCALE, SERVICE_NAME, getLevel());
-winston.addColors(getColors());
 function print(lvl, msg, id, user, tags) {
     if (!isString(msg, "!0"))
         return;
