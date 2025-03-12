@@ -17,6 +17,7 @@ function setService(service: string | undefined): string {
 
 function setTransports(): transport[] {
   return [new winston.transports.Console()];
+  // new winston.transports.File({ filename: 'log.json', format: winston.format.json() })
 } 
 
 function setFormat(dateFormat: string, service: string): void {
@@ -36,6 +37,20 @@ function setFormat(dateFormat: string, service: string): void {
            .replace(/\s{2,}/g, " ");
         return `${info.timestamp} - ${sn}${info.level}: ${msg}`;
     }),
+    // winston.format.json(),
+    // winston.format.printf(
+    //   (info: Logform.TransformableInfo) => {
+    //     const msg = info.message
+    //       ?.toString()
+    //       .replace(/[\n\r]+/g, "")
+    //       .replace(/\s{2,}/g, " ");
+    //     return JSON.stringify({
+    //       timestamp: info.timestamp,
+    //       service: sn.trim(),
+    //       level: info.level,
+    //       message: msg
+    //     });
+    //   }
   );
 }
 
