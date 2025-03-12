@@ -1,17 +1,16 @@
 
 import { 
-  isStringOfLength, 
   isValidInteger, 
   isString,
   isArray
 } from "@dwtechs/checkard";
 
 function normalizeId(id?: string | number): string {
-  return ((isString(id) && isStringOfLength(id, 1, 99)) || isValidInteger(id, 1, 99)) ? `id: ${id} - ` : "";
+  return (isString(id, "!0") || isValidInteger(id, 1)) ? `id: ${id} - ` : "";
 }
 
 function normalizeUser(user?: string | number): string {
-  return ((isString(user) && isStringOfLength(user, 1, 99)) || isValidInteger(user, 1, 99)) ? `user: ${user} - ` : "";
+  return (isString(user, "!0") || isValidInteger(user, 1)) ? `user: ${user} - ` : "";
 }
 
 function normalizeTags(tags?: string[] | number[]): string {
