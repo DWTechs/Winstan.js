@@ -25,13 +25,13 @@ https://github.com/DWTechs/Winstan.js
 */
 
 import winston from 'winston';
-import { isString, isStringOfLength, isValidInteger, isArray, isProperty } from '@dwtechs/checkard';
+import { isString, isValidInteger, isArray, isStringOfLength, isProperty } from '@dwtechs/checkard';
 
 function normalizeId(id) {
-    return ((isString(id) && isStringOfLength(id, 1, 99)) || isValidInteger(id, 1, 99)) ? `id: ${id} - ` : "";
+    return (isString(id, "!0") || isValidInteger(id, 1)) ? `id: ${id} - ` : "";
 }
 function normalizeUser(user) {
-    return ((isString(user) && isStringOfLength(user, 1, 99)) || isValidInteger(user, 1, 99)) ? `user: ${user} - ` : "";
+    return (isString(user, "!0") || isValidInteger(user, 1)) ? `user: ${user} - ` : "";
 }
 function normalizeTags(tags) {
     return isArray(tags, ">", 0) ? `[${tags.toString()}] ` : "";
