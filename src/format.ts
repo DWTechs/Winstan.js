@@ -35,7 +35,7 @@ function setFormat(dateFormat: string, service: string): void {
           ?.toString()
            .replace(/[\n\r]+/g, "")
            .replace(/\s{2,}/g, " ");
-        return `${info.timestamp} - ${sn}${info.level}: ${msg}`;
+        return `${info.timestamp} - ${sn}${info.level} - id=${info.id} - userId=${info.id} - tags=${info.tags.toString()} : ${msg}`;
     }),
     // winston.format.json(),
     // winston.format.printf(
