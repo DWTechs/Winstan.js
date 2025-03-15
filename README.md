@@ -50,8 +50,14 @@ $ npm i @dwtechs/winstan
 import { log } from "@dwtechs/winstan";
 
 log.error(`App cannot start: ${err.msg}`);
-log.info(`App started on port : ${PORT}`, { user: "System" });
-log.debug(`Update one(user=${JSON.stringify(users)})`, { user: "admin", tags: ["user", "update"] });
+log.info(
+  `App started on port : ${PORT}`, 
+  { user: "System" }
+);
+log.debug(
+  `Update one(user=${JSON.stringify(users)})`, 
+  { user: "admin", tags: ["user", "update"] }
+);
 
 ```
 
@@ -185,7 +191,10 @@ const log: {
 You can use this object to add more information to the log like IDs, tags, etc.
 
 ```javascript
-  log.debug(`Add user(user=${JSON.stringify(users)})`, { user: userId, tags: ["addUser"] });
+  log.debug(
+    `Add user(user=${JSON.stringify(users)})`, 
+    { user: userId, tags: ["addUser"] }
+  );
 ```
 
 ## Express.js plugins
