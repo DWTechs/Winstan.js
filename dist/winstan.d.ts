@@ -25,18 +25,13 @@ https://github.com/DWTechs/Winstan.js
 */
 
 export type Levels = 'error' | 'warn' | 'info' | 'debug';
-export type Infos = {
-    id: string | number;
-    user: string | number;
-    tags: string[] | number[];
-};
 
 declare function init(timeZone: string | undefined, locale: string | undefined, service: string | undefined, level: Levels): void;
 declare const log: {
-    error: (msg: string, infos: Infos) => void;
-    warn: (msg: string, infos: Infos) => void;
-    info: (msg: string, infos: Infos) => void;
-    debug: (msg: string, infos: Infos) => void;
+    error: (msg: string, info?: Record<string, unknown>) => void;
+    warn: (msg: string, info?: Record<string, unknown>) => void;
+    info: (msg: string, info?: Record<string, unknown>) => void;
+    debug: (msg: string, info?: Record<string, unknown>) => void;
 };
 
 export { 

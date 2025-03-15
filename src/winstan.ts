@@ -1,7 +1,6 @@
-import type { Levels, Infos } from "./types";
+import type { Levels } from "./types";
 import winston from "winston";
 import { isString } from "@dwtechs/checkard";
-
 import { 
   setDateFormat,
   setService,
@@ -43,37 +42,37 @@ init(TZ, LOCALE, SERVICE_NAME, getLevel());
 function print(
   lvl: Levels,
   msg: string,
-  infos: Infos
+  info?: Record<string, unknown>
 ): void {
   if (!isString(msg, "!0"))
     return;
-  logger[lvl](msg, infos);
+  logger[lvl](msg, info);
 }
 
 const log = {
   error: (
     msg: string,
-    infos: Infos,
+    info?: Record<string, unknown>,
   ) => {
-    print('error', msg, infos);
+    print('error', msg, info);
   },
   warn: (
     msg: string,
-    infos: Infos,
+    info?: Record<string, unknown>,
   ) => {
-    print('warn', msg, infos);
+    print('warn', msg, info);
   },
   info: (
     msg: string,
-    infos: Infos,
+    info?: Record<string, unknown>,
   ) => {
-    print('info', msg, infos);
+    print('info', msg, info);
   },
   debug: (
     msg: string,
-    infos: Infos,
+    info?: Record<string, unknown>,
   ) => {
-    print('debug', msg, infos);
+    print('debug', msg, info);
   }
 };
 

@@ -51,7 +51,7 @@ import { log } from "@dwtechs/winstan";
 
 log.error(`App cannot start: ${err.msg}`);
 log.info(`App started on port : ${PORT}`);
-log.debug(`UpdateOne(user=${JSON.stringify(users)})`, { user: "admin", tags: ["user", "update"] });
+log.debug(`Update one(user=${JSON.stringify(users)})`, { user: "admin", tags: ["user", "update"] });
 
 ```
 
@@ -137,11 +137,6 @@ Any other value (like "dev" or "development") will set the log level to **debug*
 ```javascript
 
 export type Levels = 'error'|'warn'|'info'|'debug';
-export type Infos = {
-  id: string | number,
-  user: string | number,
-  tags: string[] | number[]
-};
 
 function init(
   timeZone: string | undefined, // timezone for date and time. Default to europe/paris
@@ -152,27 +147,21 @@ function init(
 
 
 const log: {
-  error: (msg: string, infos: Infos) => void;
-  warn: (msg: string, infos: Infos) => void;
-  info: (msg: string, infos: Infos) => void;
-  debug: (msg: string, infos: Infos) => void;
+  error: (msg: string, info?: Info) => void;
+  warn: (msg: string, info?: Info) => void;
+  info: (msg: string, info?: Info) => void;
+  debug: (msg: string, info?: Info) => void;
 };
 
 ```
 
-### Id option
+### Info
 
-IDs are often used to uniquely identify requests, sessions, or other entities. Displaying IDs in logs helps in tracing and debugging by providing a way to correlate log entries with specific entities or events.
+You can use this object to add more information to the log like IDs, tags, etc.
 
-### User option
-
-User is the name or id of the user who made the action. It is optional and can be used to filter logs in a monitoring tool.
-
-### Tags
-
-Tags are a way to categorize logs. They are optional and can be used to filter logs in a monitoring tool.
-They can be used categorize logs by action, by module, etc.
-
+```javascript
+  log.debug(`Add user(user=${JSON.stringify(users)})`, { user: userId, tags: ["addUser"] });
+```
 
 ## Express.js plugins
 

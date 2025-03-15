@@ -27,14 +27,18 @@ https://github.com/DWTechs/Winstan.js
 import winston from 'winston';
 import { isString, isNumber, isArray, isStringOfLength, isProperty } from '@dwtechs/checkard';
 
-function normalizeId(id) {
-    return (isString(id, "!0") || isNumber(id, true, ">", 0)) ? `id=${id} - ` : "";
-}
-function normalizeUser(user) {
-    return (isString(user, "!0") || isNumber(user, true, ">", 0)) ? `userId=${user} - ` : "";
-}
-function normalizeTags(tags) {
-    return isArray(tags, ">", 0) ? `tags=[${tags.toString()}] - ` : "";
+function normalizeInfo(infos) {
+    let m = "";
+    for (const key in infos) {
+        if (key === "message" || key === "level" || key === "timestamp")
+            continue;
+        const v = infos[key];
+        if (isString(v, "!0") || isNumber(v, true, ">", 0))
+            m += `${key}=${v} - `;
+        if (isArray(v, ">", 0))
+            m += `${key}=[${v.toString()}] - `;
+    }
+    return m;
 }
 
 let format;
@@ -50,14 +54,12 @@ function setTransports() {
     return [new winston.transports.Console()];
 }
 function setFormat(dateFormat, service) {
-    const sn = service ? `${service} ` : "";
+    const sn = service ? `service=${service} ` : "";
     format = winston.format.combine(winston.format.colorize({ all: true }), winston.format.timestamp({ format: dateFormat }), winston.format.align(), winston.format.printf((info) => {
         var _a;
         const msg = (_a = info.message) === null || _a === void 0 ? void 0 : _a.toString().replace(/[\n\r]+/g, "").replace(/\s{2,}/g, " ");
-        const i = normalizeId(info.id);
-        const u = normalizeUser(info.userId);
-        const t = normalizeTags(info.tags);
-        return `${info.timestamp} - ${sn}${i}${u}${t}${info.level}: ${msg}`;
+        const i = normalizeInfo(info);
+        return `${info.timestamp} - ${sn}${i}level=${info.level} - msg=${msg}`;
     }));
 }
 function getFormat() {
@@ -100,23 +102,23 @@ function init(timeZone, locale, service, level) {
 const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = (_a = process === null || process === void 0 ? void 0 : process.env) !== null && _a !== void 0 ? _a : null;
 setLevel((NODE_ENV === "prod" || NODE_ENV === "production") ? "info" : "debug");
 init(TZ, LOCALE, SERVICE_NAME, getLevel());
-function print(lvl, msg, infos) {
+function print(lvl, msg, info) {
     if (!isString(msg, "!0"))
         return;
-    logger[lvl](msg, infos);
+    logger[lvl](msg, info);
 }
 const log = {
-    error: (msg, infos) => {
-        print('error', msg, infos);
+    error: (msg, info) => {
+        print('error', msg, info);
     },
-    warn: (msg, infos) => {
-        print('warn', msg, infos);
+    warn: (msg, info) => {
+        print('warn', msg, info);
     },
-    info: (msg, infos) => {
-        print('info', msg, infos);
+    info: (msg, info) => {
+        print('info', msg, info);
     },
-    debug: (msg, infos) => {
-        print('debug', msg, infos);
+    debug: (msg, info) => {
+        print('debug', msg, info);
     }
 };
 

@@ -2,7 +2,7 @@
 import type { Logform, transport } from "winston";
 import winston from "winston";
 import { isString, isStringOfLength } from "@dwtechs/checkard";
-import { normalizeId, normalizeUser, normalizeTags } from "./normalize";
+import { normalizeInfo } from "./info";
 
 let format: Logform.Format;
 
@@ -22,7 +22,7 @@ function setTransports(): transport[] {
 } 
 
 function setFormat(dateFormat: string, service: string): void {
-  const sn = service ? `${service} ` : "";
+  const sn = service ? `service=${service} ` : "";
   format = winston.format.combine(
     winston.format.colorize({ all: true }),
     winston.format.timestamp({ format: dateFormat }), // YYYY-MM-DD HH:mm:ss:ms
@@ -36,10 +36,8 @@ function setFormat(dateFormat: string, service: string): void {
           ?.toString()
            .replace(/[\n\r]+/g, "")
            .replace(/\s{2,}/g, " ");
-        const i = normalizeId(info.id);
-        const u = normalizeUser(info.userId);
-        const t = normalizeTags(info.tags);
-        return `${info.timestamp} - ${sn}${i}${u}${t}${info.level}: ${msg}`;
+        const i = normalizeInfo(info);
+        return `${info.timestamp} - ${sn}${i}level=${info.level} - msg=${msg}`;
     }),
     // winston.format.json(),
     // winston.format.printf(
