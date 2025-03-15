@@ -1,3 +1,4 @@
+import type { Logform } from "winston";
 import type { Levels } from "./types";
 import winston from "winston";
 import { isString } from "@dwtechs/checkard";
@@ -13,6 +14,17 @@ import { getLevels, getLevel, setLevel } from "./level";
 
 let logger: winston.Logger;
 
+
+/**
+ * Initializes the logging configuration.
+ *
+ * @param timeZone - The time zone to be used for logging timestamps. If undefined, the default time zone will be used.
+ * @param locale - The locale to be used for formatting dates. If undefined, the default locale will be used.
+ * @param service - The name of the service for which the logging is being configured. If undefined, a default service name will be used.
+ * @param level - The logging level to be set. This determines the severity of logs that will be captured.
+ * 
+ * @returns void
+ */
 function init(
   timeZone: string | undefined,
   locale: string | undefined,
@@ -42,7 +54,7 @@ init(TZ, LOCALE, SERVICE_NAME, getLevel());
 function print(
   lvl: Levels,
   msg: string,
-  info?: Record<string, unknown>
+  info?: Logform.TransformableInfo
 ): void {
   if (!isString(msg, "!0"))
     return;
@@ -52,25 +64,25 @@ function print(
 const log = {
   error: (
     msg: string,
-    info?: Record<string, unknown>,
+    info?: Logform.TransformableInfo,
   ) => {
     print('error', msg, info);
   },
   warn: (
     msg: string,
-    info?: Record<string, unknown>,
+    info?: Logform.TransformableInfo,
   ) => {
     print('warn', msg, info);
   },
   info: (
     msg: string,
-    info?: Record<string, unknown>,
+    info?: Logform.TransformableInfo,
   ) => {
     print('info', msg, info);
   },
   debug: (
     msg: string,
-    info?: Record<string, unknown>,
+    info?: Logform.TransformableInfo,
   ) => {
     print('debug', msg, info);
   }

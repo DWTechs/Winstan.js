@@ -138,6 +138,16 @@ Any other value (like "dev" or "development") will set the log level to **debug*
 
 export type Levels = 'error'|'warn'|'info'|'debug';
 
+/**
+ * Initializes the logging configuration.
+ *
+ * @param timeZone - The time zone to be used for logging timestamps. If undefined, the default time zone will be used.
+ * @param locale - The locale to be used for formatting dates. If undefined, the default locale will be used.
+ * @param service - The name of the service for which the logging is being configured. If undefined, a default service name will be used.
+ * @param level - The logging level to be set. This determines the severity of logs that will be captured.
+ * 
+ * @returns void
+ */
 function init(
   timeZone: string | undefined, // timezone for date and time. Default to europe/paris
   locale: string | undefined, // locale for date and time. Default to fr-FR
@@ -145,12 +155,11 @@ function init(
   level: Levels // minimum level to log. default to debug): Logform.Format;
 ): void;
 
-
 const log: {
-  error: (msg: string, info?: Info) => void,
-  warn: (msg: string, info?: Info) => void,
-  info: (msg: string, info?: Info) => void,
-  debug: (msg: string, info?: Info) => void,
+  error: (msg: string, info?: Logform.TransformableInfo) => void;
+  warn: (msg: string, info?: Logform.TransformableInfo) => void;
+  info: (msg: string, info?: Logform.TransformableInfo) => void;
+  debug: (msg: string, info?: Logform.TransformableInfo) => void;
 };
 
 ```

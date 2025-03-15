@@ -27,12 +27,12 @@ https://github.com/DWTechs/Winstan.js
 import winston from 'winston';
 import { isString, isNumber, isArray, isStringOfLength, isProperty } from '@dwtechs/checkard';
 
-function normalizeInfo(infos) {
+function normalizeInfo(info) {
     let m = "";
-    for (const key in infos) {
-        if (key === "message" || key === "level" || key === "timestamp")
+    for (const key in info) {
+        if (key === "message" || key === "timestamp")
             continue;
-        const v = infos[key];
+        const v = info[key];
         if (isString(v, "!0") || isNumber(v, true, ">", 0))
             m += `${key}=${v} - `;
         if (isArray(v, ">", 0))
@@ -59,7 +59,7 @@ function setFormat(dateFormat, service) {
         var _a;
         const msg = (_a = info.message) === null || _a === void 0 ? void 0 : _a.toString().replace(/[\n\r]+/g, "").replace(/\s{2,}/g, " ");
         const i = normalizeInfo(info);
-        return `${info.timestamp} - ${sn}${i}level=${info.level} - msg=${msg}`;
+        return `${info.timestamp} - ${sn}${i}msg=${msg}`;
     }));
 }
 function getFormat() {

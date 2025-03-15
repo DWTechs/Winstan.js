@@ -1,16 +1,16 @@
-
+import type { Logform } from "winston";
 import { 
   isNumber,
   isString,
   isArray
 } from "@dwtechs/checkard";
 
-function normalizeInfo(infos: Record<string, unknown>): string {
+function normalizeInfo(info: Logform.TransformableInfo): string {
   let m = "";
-  for (const key in infos) {
-    if (key === "message" || key === "level" || key === "timestamp")
+  for (const key in info) {
+    if (key === "message" || key === "timestamp")
       continue;
-    const v = infos[key];
+    const v = info[key];
     if (isString(v, "!0") || isNumber(v, true, ">", 0))
       m += `${key}=${v} - `;
     if (isArray(v, ">", 0))

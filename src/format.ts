@@ -1,4 +1,3 @@
-
 import type { Logform, transport } from "winston";
 import winston from "winston";
 import { isString, isStringOfLength } from "@dwtechs/checkard";
@@ -37,7 +36,7 @@ function setFormat(dateFormat: string, service: string): void {
            .replace(/[\n\r]+/g, "")
            .replace(/\s{2,}/g, " ");
         const i = normalizeInfo(info);
-        return `${info.timestamp} - ${sn}${i}level=${info.level} - msg=${msg}`;
+        return `${info.timestamp} - ${sn}${i}msg=${msg}`;
     }),
     // winston.format.json(),
     // winston.format.printf(
