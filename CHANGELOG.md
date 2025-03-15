@@ -1,6 +1,7 @@
 # 0.4.0 (Mar 15th 2025)
 
 - Add info property to the log function to add more information to the log if necessary
+- Use Logfmt format for logs
 - Update @dwtechs/checkard dependency to 3.2.3 
 
 

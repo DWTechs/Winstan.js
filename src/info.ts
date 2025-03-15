@@ -8,13 +8,15 @@ import {
 function normalizeInfo(info: Logform.TransformableInfo): string {
   let m = "";
   for (const key in info) {
-    if (key === "message" || key === "timestamp")
+    if (key === "message" || key === "level")
       continue;
     const v = info[key];
-    if (isString(v, "!0") || isNumber(v, true, ">", 0))
-      m += `${key}=${v} - `;
+    if (isString(v, "!0"))
+      m += `${key}="${v}" `;
+    if (isNumber(v, true, ">", 0))
+      m += `${key}=${v} `;
     if (isArray(v, ">", 0))
-      m += `${key}=[${v.toString()}] - `;
+      m += `${key}="${v.toString()}" `;
   }
   return m;
 }

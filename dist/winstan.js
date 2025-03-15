@@ -30,13 +30,15 @@ import { isString, isNumber, isArray, isStringOfLength, isProperty } from '@dwte
 function normalizeInfo(info) {
     let m = "";
     for (const key in info) {
-        if (key === "message" || key === "timestamp")
+        if (key === "message" || key === "level")
             continue;
         const v = info[key];
-        if (isString(v, "!0") || isNumber(v, true, ">", 0))
-            m += `${key}=${v} - `;
+        if (isString(v, "!0"))
+            m += `${key}="${v}" `;
+        if (isNumber(v, true, ">", 0))
+            m += `${key}=${v} `;
         if (isArray(v, ">", 0))
-            m += `${key}=[${v.toString()}] - `;
+            m += `${key}="${v.toString()}" `;
     }
     return m;
 }
@@ -54,12 +56,12 @@ function setTransports() {
     return [new winston.transports.Console()];
 }
 function setFormat(dateFormat, service) {
-    const sn = service ? `service=${service} ` : "";
+    const sn = service ? `service="${service}" ` : "";
     format = winston.format.combine(winston.format.colorize({ all: true }), winston.format.timestamp({ format: dateFormat }), winston.format.align(), winston.format.printf((info) => {
         var _a;
-        const msg = (_a = info.message) === null || _a === void 0 ? void 0 : _a.toString().replace(/[\n\r]+/g, "").replace(/\s{2,}/g, " ");
+        const msg = (_a = info.message) === null || _a === void 0 ? void 0 : _a.toString().replace(/[\n\r]+/g, "").replace(/\s{2,}/g, " ").trim();
         const i = normalizeInfo(info);
-        return `${info.timestamp} - ${sn}${i}msg=${msg}`;
+        return `${info.level} | ${msg} ${sn}${i}`;
     }));
 }
 function getFormat() {

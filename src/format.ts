@@ -21,7 +21,7 @@ function setTransports(): transport[] {
 } 
 
 function setFormat(dateFormat: string, service: string): void {
-  const sn = service ? `service=${service} ` : "";
+  const sn = service ? `service="${service}" ` : "";
   format = winston.format.combine(
     winston.format.colorize({ all: true }),
     winston.format.timestamp({ format: dateFormat }), // YYYY-MM-DD HH:mm:ss:ms
@@ -34,9 +34,10 @@ function setFormat(dateFormat: string, service: string): void {
         const msg = info.message
           ?.toString()
            .replace(/[\n\r]+/g, "")
-           .replace(/\s{2,}/g, " ");
+           .replace(/\s{2,}/g, " ")
+           .trim();
         const i = normalizeInfo(info);
-        return `${info.timestamp} - ${sn}${i}msg=${msg}`;
+        return `${info.level} | ${msg} ${sn}${i}`;
     }),
     // winston.format.json(),
     // winston.format.printf(
