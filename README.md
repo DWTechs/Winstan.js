@@ -51,7 +51,7 @@ import { log } from "@dwtechs/winstan";
 
 log.error(`App cannot start: ${err.msg}`);
 log.info(`App started on port : ${PORT}`);
-log.debug(`UpdateOne(user=${JSON.stringify(users)})`);
+log.debug(`UpdateOne(user=${JSON.stringify(users)})`, { user: "admin", tags: ["user", "update"] });
 
 ```
 
@@ -105,7 +105,7 @@ So you do not need to init the library in the code.
 
 import { log } from "@dwtechs/winstan";
 
-log.info(`App started on port : ${PORT}`);
+log.info(`App started on port : ${PORT}`, { user: "System" });
 
 ```
 
@@ -119,12 +119,7 @@ This method will override ENV variables.
 
 import { log, init } from "@dwtechs/winstan";
 
-init( 
-  timeZone: "UTC",
-  locale: "fr-FR",
-  service: "ms_user",
-  level: "debug"
-);
+init( "UTC", "fr-FR", "ms_user", "debug" );
 log.info(`App started on port : ${PORT}`);
 
 ```
@@ -142,48 +137,34 @@ Any other value (like "dev" or "development") will set the log level to **debug*
 ```javascript
 
 export type Levels = 'error'|'warn'|'info'|'debug';
+export type Infos = {
+  id: string | number,
+  user: string | number,
+  tags: string[] | number[]
+};
 
 function init(
-  timeZone: string, // timezone for date and time. Default to europe/paris
-  locale: string, // locale for date and time. Default to fr-FR
-  service: string, // service name. Default to empty string
+  timeZone: string | undefined, // timezone for date and time. Default to europe/paris
+  locale: string | undefined, // locale for date and time. Default to fr-FR
+  service: string | undefined, // service name. Default to empty string
   level: Levels // minimum level to log. default to debug): Logform.Format;
-): Logform.Format;
+): void;
+
 
 const log: {
-  error: (
-    msg: string,
-    id?: string | number | undefined,
-    user?: string | number | undefined,
-    tag?: string | undefined
-  ) => void;
-  warn: (
-    msg: string,
-    id?: string | number | undefined,
-    user?: string | number | undefined,
-    tag?: string | undefined
-  ) => void;
-  info: (
-    msg: string,
-    id?: string | number | undefined,
-    user?: string | number | undefined,
-    tag?: string | undefined
-  ) => void;
-  debug: (
-    msg: string,
-    id?: string | number | undefined,
-    user?: string | number | undefined,
-    tag?: string | undefined
-  ) => void;
+  error: (msg: string, infos: Infos) => void;
+  warn: (msg: string, infos: Infos) => void;
+  info: (msg: string, infos: Infos) => void;
+  debug: (msg: string, infos: Infos) => void;
 };
 
 ```
 
-### Id
+### Id option
 
 IDs are often used to uniquely identify requests, sessions, or other entities. Displaying IDs in logs helps in tracing and debugging by providing a way to correlate log entries with specific entities or events.
 
-### User
+### User option
 
 User is the name or id of the user who made the action. It is optional and can be used to filter logs in a monitoring tool.
 

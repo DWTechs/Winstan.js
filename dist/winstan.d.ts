@@ -24,22 +24,19 @@ SOFTWARE.
 https://github.com/DWTechs/Winstan.js
 */
 
-import type { Logform } from "winston";
-
 export type Levels = 'error' | 'warn' | 'info' | 'debug';
-export type Options = {
-  timeZone: string;
-  locale: string;
-  service: string;
-  level: Levels; 
+export type Infos = {
+    id: string | number;
+    user: string | number;
+    tags: string[] | number[];
 };
 
 declare function init(timeZone: string | undefined, locale: string | undefined, service: string | undefined, level: Levels): void;
 declare const log: {
-  error: (msg: string, id?: string | number, user?: string | number, tags?: string[] | number[]) => void;
-  warn: (msg: string, id?: string | number, user?: string | number, tags?: string[] | number[]) => void;
-  info: (msg: string, id?: string | number, user?: string | number, tags?: string[] | number[]) => void;
-  debug: (msg: string, id?: string | number, user?: string | number, tags?: string[] | number[]) => void;
+    error: (msg: string, infos: Infos) => void;
+    warn: (msg: string, infos: Infos) => void;
+    info: (msg: string, infos: Infos) => void;
+    debug: (msg: string, infos: Infos) => void;
 };
 
 export { 

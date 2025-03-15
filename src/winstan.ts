@@ -1,7 +1,7 @@
-import type { Levels } from "./types";
+import type { Levels, Infos } from "./types";
 import winston from "winston";
-// import { isString } from "@dwtechs/checkard";
-// import { normalizeLog } from "./normalize";
+import { isString } from "@dwtechs/checkard";
+
 import { 
   setDateFormat,
   setService,
@@ -12,7 +12,7 @@ import {
 import { getLevels, getLevel, setLevel } from "./level";
 // import { getColors } from "./color";
 
-let log: winston.Logger;
+let logger: winston.Logger;
 
 function init(
   timeZone: string | undefined,
@@ -24,7 +24,7 @@ function init(
   const s = setService(service);
   setLevel(level);
   setFormat(dateFormat, s);
-  log = winston.createLogger({ 
+  logger = winston.createLogger({ 
     level: getLevel(),
     silent: false,
     format: getFormat(),
@@ -40,52 +40,42 @@ init(TZ, LOCALE, SERVICE_NAME, getLevel());
 
 // winston.addColors(getColors());
 
-// function print(
-//   lvl: Levels,
-//   msg: string,
-//   id?: string | number,
-//   user?: string | number,
-//   tags?: string[] | number[]
-// ): void {
-//   if (!isString(msg, "!0"))
-//     return;
-//   logger[lvl](normalizeLog(msg, id, user, tags));
-// }
+function print(
+  lvl: Levels,
+  msg: string,
+  infos: Infos
+): void {
+  if (!isString(msg, "!0"))
+    return;
+  logger[lvl](msg, infos);
+}
 
-// const log = {
-//   error: (
-//     msg: string,
-//     id?: string | number,
-//     user?: string | number,
-//     tags?: string[] | number[]
-//   ) => {
-//     print('error', msg, id, user, tags);
-//   },
-//   warn: (
-//     msg: string,
-//     id?: string | number,
-//     user?: string | number,
-//     tags?: string[] | number[]
-//   ) => {
-//     print('warn', msg, id, user, tags);
-//   },
-//   info: (
-//     msg: string,
-//     id?: string | number,
-//     user?: string | number,
-//     tags?: string[] | number[]
-//   ) => {
-//     print('info', msg, id, user, tags);
-//   },
-//   debug: (
-//     msg: string,
-//     id?: string | number,
-//     user?: string | number,
-//     tags?: string[] | number[]
-//   ) => {
-//     print('debug', msg, id, user, tags);
-//   }
-// };
+const log = {
+  error: (
+    msg: string,
+    infos: Infos,
+  ) => {
+    print('error', msg, infos);
+  },
+  warn: (
+    msg: string,
+    infos: Infos,
+  ) => {
+    print('warn', msg, infos);
+  },
+  info: (
+    msg: string,
+    infos: Infos,
+  ) => {
+    print('info', msg, infos);
+  },
+  debug: (
+    msg: string,
+    infos: Infos,
+  ) => {
+    print('debug', msg, infos);
+  }
+};
 
 export {
   init, 

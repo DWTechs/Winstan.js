@@ -25,24 +25,16 @@ https://github.com/DWTechs/Winstan.js
 */
 
 import winston from 'winston';
-import { isString, isValidInteger, isArray, isStringOfLength, isProperty } from '@dwtechs/checkard';
+import { isString, isNumber, isArray, isStringOfLength, isProperty } from '@dwtechs/checkard';
 
 function normalizeId(id) {
-    return (isString(id, "!0") || isValidInteger(id, 1)) ? `id: ${id} - ` : "";
+    return (isString(id, "!0") || isNumber(id, true, ">", 0)) ? `id=${id} - ` : "";
 }
 function normalizeUser(user) {
-    return (isString(user, "!0") || isValidInteger(user, 1)) ? `user: ${user} - ` : "";
+    return (isString(user, "!0") || isNumber(user, true, ">", 0)) ? `userId=${user} - ` : "";
 }
 function normalizeTags(tags) {
-    return isArray(tags, ">", 0) ? `[${tags.toString()}] ` : "";
-}
-function normalizeLog(msg, id, user, tags) {
-    if (!isString(msg, "!0"))
-        return false;
-    const i = normalizeId(id);
-    const u = normalizeUser(user);
-    const t = normalizeTags(tags);
-    return `${i}${u}${t}${msg}`;
+    return isArray(tags, ">", 0) ? `tags=[${tags.toString()}] - ` : "";
 }
 
 let format;
@@ -62,7 +54,10 @@ function setFormat(dateFormat, service) {
     format = winston.format.combine(winston.format.colorize({ all: true }), winston.format.timestamp({ format: dateFormat }), winston.format.align(), winston.format.printf((info) => {
         var _a;
         const msg = (_a = info.message) === null || _a === void 0 ? void 0 : _a.toString().replace(/[\n\r]+/g, "").replace(/\s{2,}/g, " ");
-        return `${info.timestamp} - ${sn}${info.level}: ${msg}`;
+        const i = normalizeId(info.id);
+        const u = normalizeUser(info.userId);
+        const t = normalizeTags(info.tags);
+        return `${info.timestamp} - ${sn}${i}${u}${t}${info.level}: ${msg}`;
     }));
 }
 function getFormat() {
@@ -105,23 +100,23 @@ function init(timeZone, locale, service, level) {
 const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = (_a = process === null || process === void 0 ? void 0 : process.env) !== null && _a !== void 0 ? _a : null;
 setLevel((NODE_ENV === "prod" || NODE_ENV === "production") ? "info" : "debug");
 init(TZ, LOCALE, SERVICE_NAME, getLevel());
-function print(lvl, msg, id, user, tags) {
+function print(lvl, msg, infos) {
     if (!isString(msg, "!0"))
         return;
-    logger[lvl](normalizeLog(msg, id, user, tags));
+    logger[lvl](msg, infos);
 }
 const log = {
-    error: (msg, id, user, tags) => {
-        print('error', msg, id, user, tags);
+    error: (msg, infos) => {
+        print('error', msg, infos);
     },
-    warn: (msg, id, user, tags) => {
-        print('warn', msg, id, user, tags);
+    warn: (msg, infos) => {
+        print('warn', msg, infos);
     },
-    info: (msg, id, user, tags) => {
-        print('info', msg, id, user, tags);
+    info: (msg, infos) => {
+        print('info', msg, infos);
     },
-    debug: (msg, id, user, tags) => {
-        print('debug', msg, id, user, tags);
+    debug: (msg, infos) => {
+        print('debug', msg, infos);
     }
 };
 
