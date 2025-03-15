@@ -50,7 +50,7 @@ $ npm i @dwtechs/winstan
 import { log } from "@dwtechs/winstan";
 
 log.error(`App cannot start: ${err.msg}`);
-log.info(`App started on port : ${PORT}`);
+log.info(`App started on port : ${PORT}`, { user: "System" });
 log.debug(`Update one(user=${JSON.stringify(users)})`, { user: "admin", tags: ["user", "update"] });
 
 ```
@@ -73,15 +73,14 @@ Winstan will start with the following default configuration :
   let locale = "fr-FR";
   let timeZone = "europe/paris";
   let level = "debug";
+  let serviceName = "";
 ```
-
-**DefaultService** is the service name. (Or the application name)
-If provided, it will appear at the beginning of every log.
+**level** is the log level to display.
+**locale** is the locale configuration to set date and time to your region.
+**timeZone** is the timezone configuration to set time to your region.
+**serviceName** is the service name. (Or the application name)
+If provided, it will appear in every log.
 It is useful in a multi-service or multi-application monitoring tool.
-
-**defaultUser** is the user name or id.
-If provided, it will appear in the message of the log.
-It is useful to know who made the action in a monitoring tool.
 
 You can configure Winstan using 2 methods :
 
@@ -98,18 +97,16 @@ example :
   SERVICE_NAME="ms_user"
 ```
 
+if **NODE_ENV** is set to "production" or "prod", the log level will be set to **info**.
+If it is set to any other value, the log level will be set to **debug**.
+**LOCALE** is the locale configuration to set date and time to your region.
+**TZ** is the timezone configuration to set time to your region.
+**SERVICE_NAME** is the service name. (Or the application name)
+If provided, it will appear in every log.
+It is useful in a multi-service or multi-application monitoring tool.
+
 These environment variables will update the default values of the lib at start up.
 So you do not need to init the library in the code.
-
-```javascript
-
-import { log } from "@dwtechs/winstan";
-
-log.info(`App started on port : ${PORT}`, { user: "System" });
-
-```
-
-**TZ** is the timezone configuration to set time to your region.
 
 ### init() method
 
@@ -164,7 +161,7 @@ const log: {
 
 ```
 
-### Info
+### Info parameter
 
 You can use this object to add more information to the log like IDs, tags, etc.
 
