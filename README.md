@@ -156,10 +156,10 @@ function init(
 ): void;
 
 const log: {
-  error: (msg: string, info?: Logform.TransformableInfo) => void;
-  warn: (msg: string, info?: Logform.TransformableInfo) => void;
-  info: (msg: string, info?: Logform.TransformableInfo) => void;
-  debug: (msg: string, info?: Logform.TransformableInfo) => void;
+  error: (msg: string, info?: Logform.TransformableInfo) => void,
+  warn: (msg: string, info?: Logform.TransformableInfo) => void,
+  info: (msg: string, info?: Logform.TransformableInfo) => void,
+  debug: (msg: string, info?: Logform.TransformableInfo) => void,
 };
 
 ```
