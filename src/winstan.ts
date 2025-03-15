@@ -1,4 +1,3 @@
-import type { Logform } from "winston";
 import type { Levels } from "./types";
 import winston from "winston";
 import { isString } from "@dwtechs/checkard";
@@ -54,7 +53,7 @@ init(TZ, LOCALE, SERVICE_NAME, getLevel());
 function print(
   lvl: Levels,
   msg: string,
-  info?: Logform.TransformableInfo
+  info?: Record<string, string | number | string[] | number[]>
 ): void {
   if (!isString(msg, "!0"))
     return;
@@ -64,25 +63,25 @@ function print(
 const log = {
   error: (
     msg: string,
-    info?: Logform.TransformableInfo,
+    info?: Record<string, string | number | string[] | number[]>,
   ) => {
     print('error', msg, info);
   },
   warn: (
     msg: string,
-    info?: Logform.TransformableInfo,
+    info?: Record<string, string | number | string[] | number[]>,
   ) => {
     print('warn', msg, info);
   },
   info: (
     msg: string,
-    info?: Logform.TransformableInfo,
+    info?: Record<string, string | number | string[] | number[]>,
   ) => {
     print('info', msg, info);
   },
   debug: (
     msg: string,
-    info?: Logform.TransformableInfo,
+    info?: Record<string, string | number | string[] | number[]>,
   ) => {
     print('debug', msg, info);
   }
