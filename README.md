@@ -85,6 +85,7 @@ It is useful in a multi-service or multi-application monitoring tool.
 You can configure Winstan using 2 methods :
 
 ### Environment variables
+--- 
 
 Four environment variables may be used by Winstan : 
 
@@ -112,6 +113,7 @@ These environment variables will update the default values of the lib at start u
 So you do not need to init the library in the code.
 
 ### init() method
+---
 
 This method will override ENV variables.
 
@@ -125,6 +127,7 @@ log.info(`App started on port : ${PORT}`);
 ```
 
 ### Production mode
+--- 
 
 Possible values for **NODE_ENV** environment variable are "production" and "prod".
 Those values will set Winstan log level to **info**.
