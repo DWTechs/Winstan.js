@@ -75,10 +75,10 @@ Winstan will start with the following default configuration :
   let level = "debug";
   let serviceName = "";
 ```
-**level** is the log level to display.  
-**locale** is the locale configuration to set date and time to your region.  
-**timeZone** is the timezone configuration to set time to your region.  
-**serviceName** is the service name. (Or the application name)  
+- **level** is the log level to display.  
+- **locale** is the locale configuration to set date and time to your region.  
+- **timeZone** is the timezone configuration to set time to your region.  
+- **serviceName** is the service name. (Or the application name)  
 If provided, it will appear in every log.  
 It is useful in a multi-service or multi-application monitoring tool.
 
@@ -97,14 +97,14 @@ example :
   SERVICE_NAME="ms_user"
 ```
 
-if **NODE_ENV** is set to "production" or "prod", the log level will be set to **info**.  
+- if **NODE_ENV** is set to "production" or "prod", the log level will be set to **info**.  
 If it is set to any other value, the log level will be set to **debug**.  
 
-**LOCALE** is the locale configuration to set date and time to your region.  
+- **LOCALE** is the locale configuration to set date and time to your region.  
 
-**TZ** is the timezone configuration to set time to your region.  
+- **TZ** is the timezone configuration to set time to your region.  
 
-**SERVICE_NAME** is the service name. (Or the application name)  
+- **SERVICE_NAME** is the service name. (Or the application name)  
 If provided, it will appear in every log.  
 It is useful in a multi-service or multi-application monitoring tool.  
 
