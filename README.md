@@ -147,10 +147,10 @@ function init(
 
 
 const log: {
-  error: (msg: string, info?: Info) => void;
-  warn: (msg: string, info?: Info) => void;
-  info: (msg: string, info?: Info) => void;
-  debug: (msg: string, info?: Info) => void;
+  error: (msg: string, info?: Info) => void,
+  warn: (msg: string, info?: Info) => void,
+  info: (msg: string, info?: Info) => void,
+  debug: (msg: string, info?: Info) => void,
 };
 
 ```
