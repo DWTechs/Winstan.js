@@ -168,6 +168,7 @@ const log: {
 ```
 
 ### Info parameter
+***
 
 You can use this object to add more information to the log like IDs, tags, etc.
 
