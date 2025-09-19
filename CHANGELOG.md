@@ -1,3 +1,8 @@
+# 0.5.0 (Sept 20th 2025)
+
+- No longer uses Winston as a dependency
+
+
 # 0.4.0 (Mar 08th 2025)
 
 - Add user, id and tags properties to the log function

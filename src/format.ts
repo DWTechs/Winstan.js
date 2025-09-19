@@ -1,67 +1,30 @@
+// src/winstan.ts
+import type { Levels } from "./types";
+import { CustomLogger, LoggerOptions } from "./logger";
 
-import type { Logform, transport } from "winston";
-import winston from "winston";
-import { isString, isStringOfLength } from "@dwtechs/checkard";
+let log: CustomLogger;
 
-let format: Logform.Format;
-
-function setDateFormat(timeZone: string | undefined, locale: string | undefined): string { 
-  const tz = (isString(timeZone) && isStringOfLength(timeZone, 2, 999)) ? timeZone : "europe/paris";
-  const l = (isString(locale) && isStringOfLength(locale, 5, 5)) ? locale : "fr-FR";  
-  return new Date().toLocaleString(l, { timeZone: tz });
+function init(
+  timeZone: string | undefined,
+  locale: string | undefined,
+  service: string | undefined,
+  level: Levels
+): void {
+  const options: LoggerOptions = {
+    timeZone,
+    locale,
+    service,
+    level,
+    colorize: true // Enable colors by default
+  };
+  
+  log = new CustomLogger(options);
 }
 
-function setService(service: string | undefined): string {
-  return (isString(service) && isStringOfLength(service, 1, 99)) ? service : "";
-}
+// Initialize with environment variables
+const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = process?.env ?? {};
+const defaultLevel: Levels = (NODE_ENV === "prod" || NODE_ENV === "production") ? "info" : "debug";
 
-function setTransports(): transport[] {
-  return [new winston.transports.Console()];
-  // new winston.transports.File({ filename: 'log.json', format: winston.format.json() })
-} 
+init(TZ, LOCALE, SERVICE_NAME, defaultLevel);
 
-function setFormat(dateFormat: string, service: string): void {
-  const sn = service ? `${service} ` : "";
-  format = winston.format.combine(
-    winston.format.colorize({ all: true }),
-    winston.format.timestamp({ format: dateFormat }), // YYYY-MM-DD HH:mm:ss:ms
-    winston.format.align(),
-    // winston.format.label({ label: 'right meow!' }),
-    // winston.format.cli(),
-    // winston.format.prettyPrint(),
-    winston.format.printf(
-      (info: Logform.TransformableInfo) => {
-        const msg = info.message
-          ?.toString()
-           .replace(/[\n\r]+/g, "")
-           .replace(/\s{2,}/g, " ");
-        return `${info.timestamp} - ${sn}${info.level} - id=${info.id} - userId=${info.id} - tags=${info.tags.toString()} : ${msg}`;
-    }),
-    // winston.format.json(),
-    // winston.format.printf(
-    //   (info: Logform.TransformableInfo) => {
-    //     const msg = info.message
-    //       ?.toString()
-    //       .replace(/[\n\r]+/g, "")
-    //       .replace(/\s{2,}/g, " ");
-    //     return JSON.stringify({
-    //       timestamp: info.timestamp,
-    //       service: sn.trim(),
-    //       level: info.level,
-    //       message: msg
-    //     });
-    //   }
-  );
-}
-
-function getFormat(): Logform.Format {
-  return format;
-}
-
-export {
-  setDateFormat,
-  setService,
-  setTransports,
-  setFormat,
-  getFormat,
-}
+export { init, log };
