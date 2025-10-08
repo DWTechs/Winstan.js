@@ -58,10 +58,21 @@ function setTransports() {
 function setFormat(dateFormat, service) {
     const sn = service ? `service="${service}" ` : "";
     format = winston.format.combine(winston.format.colorize({ all: true }), winston.format.timestamp({ format: dateFormat }), winston.format.align(), winston.format.printf((info) => {
-        var _a;
-        const msg = (_a = info.message) === null || _a === void 0 ? void 0 : _a.toString().replace(/[\n\r]+/g, "").replace(/\s{2,}/g, " ").trim();
+        var _a, _b;
+        const msg = (_b = (_a = info.message) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : "";
         const i = normalizeInfo(info);
-        return `${info.level} | ${msg} ${sn}${i}`;
+        if (msg.includes('\n')) {
+            const lines = msg.split('\n');
+            return lines
+                .map((line, idx) => idx === 0
+                ? `${info.level} | ${line.trim()} ${sn}${i}`.trim()
+                : `${' '.repeat(info.level.length)} | ${line.trim()}`)
+                .join('\n');
+        }
+        else {
+            const cleanMsg = msg.replace(/\s{2,}/g, " ").trim();
+            return `${info.level} | ${cleanMsg} ${sn}${i}`;
+        }
     }));
 }
 function getFormat() {
