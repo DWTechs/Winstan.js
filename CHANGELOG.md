@@ -1,3 +1,11 @@
+# 0.5.0 (Oct 09th 2025)
+
+- Improve log formatting with multi-line capability
+- Update dependencies: 
+    - @dwtechs/checkard: 3.5.1
+    - winston: 3.18.3
+
+
 # 0.4.0 (Mar 15th 2025)
 
 - Add info property to the log function to add more information to the log if necessary
