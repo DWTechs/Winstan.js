@@ -32,20 +32,19 @@ function setFormat(dateFormat: string, service: string): void {
     winston.format.printf(
       (info: Logform.TransformableInfo) => {
         const msg = info.message?.toString() ?? "";
-        const i = normalizeInfo(info);
-        
+        const ni = normalizeInfo(info);
+        const spacer = ' '.repeat(info.level.length);
         if (msg.includes('\n')) {
           const lines = msg.split('\n');
           return lines
-            .map((line, idx) =>
-              idx === 0
-                ? `${info.level} | ${line.trim()} ${sn}${i}`.trim()
-                : `${' '.repeat(info.level.length)} | ${line.trim()}`
+            .map((l, i) =>
+              !i ? `${info.level} | ${l.trim()} ${sn}${ni}`.trim()
+                 : `${spacer} | ${l.trim()}`
             )
             .join('\n');
         } else {
           const cleanMsg = msg.replace(/\s{2,}/g, " ").trim();
-          return `${info.level} | ${cleanMsg} ${sn}${i}`;
+          return `${info.level} | ${cleanMsg} ${sn}${ni}`;
         }
     }),
     // winston.format.json(),
