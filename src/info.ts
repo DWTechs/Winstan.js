@@ -1,11 +1,17 @@
-import type { Logform } from "winston";
 import { 
   isNumber,
   isString,
   isArray
 } from "@dwtechs/checkard";
 
-function normalizeInfo(info: Logform.TransformableInfo): string {
+// Custom type to replace winston's Logform.TransformableInfo
+interface TransformableInfo {
+  [key: string]: any;
+  message?: string;
+  level?: string;
+}
+
+function normalizeInfo(info: TransformableInfo): string {
   let m = "";
   for (const key in info) {
     if (key === "message" || key === "level")

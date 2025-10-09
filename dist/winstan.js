@@ -24,115 +24,147 @@ SOFTWARE.
 https://github.com/DWTechs/Winstan.js
 */
 
-import winston from 'winston';
-import { isString, isNumber, isArray, isStringOfLength, isProperty } from '@dwtechs/checkard';
+import { isString, isValidInteger, isArray } from '@dwtechs/checkard';
 
-function normalizeInfo(info) {
-    let m = "";
-    for (const key in info) {
-        if (key === "message" || key === "level")
-            continue;
-        const v = info[key];
-        if (isString(v, "!0"))
-            m += `${key}="${v}" `;
-        if (isNumber(v, true, ">", 0))
-            m += `${key}=${v} `;
-        if (isArray(v, ">", 0))
-            m += `${key}="${v.toString()}" `;
-    }
-    return m;
+function normalizeId(id) {
+    return (isString(id, "!0") || isValidInteger(id, 1)) ? `id: ${id} - ` : "";
 }
-
-let format;
-function setDateFormat(timeZone, locale) {
-    const tz = (isString(timeZone) && isStringOfLength(timeZone, 2, 999)) ? timeZone : "europe/paris";
-    const l = (isString(locale) && isStringOfLength(locale, 5, 5)) ? locale : "fr-FR";
-    return new Date().toLocaleString(l, { timeZone: tz });
+function normalizeUser(user) {
+    return (isString(user, "!0") || isValidInteger(user, 1)) ? `user: ${user} - ` : "";
 }
-function setService(service) {
-    return (isString(service) && isStringOfLength(service, 1, 99)) ? service : "";
-}
-function setTransports() {
-    return [new winston.transports.Console()];
-}
-function setFormat(dateFormat, service) {
-    const sn = service ? `service="${service}" ` : "";
-    format = winston.format.combine(winston.format.colorize({ all: true }), winston.format.timestamp({ format: dateFormat }), winston.format.align(), winston.format.printf((info) => {
-        var _a, _b;
-        const msg = (_b = (_a = info.message) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : "";
-        const i = normalizeInfo(info);
-        if (msg.includes('\n')) {
-            const lines = msg.split('\n');
-            return lines
-                .map((line, idx) => idx === 0
-                ? `${info.level} | ${line.trim()} ${sn}${i}`.trim()
-                : `${' '.repeat(info.level.length)} | ${line.trim()}`)
-                .join('\n');
-        }
-        else {
-            const cleanMsg = msg.replace(/\s{2,}/g, " ").trim();
-            return `${info.level} | ${cleanMsg} ${sn}${i}`;
-        }
-    }));
-}
-function getFormat() {
-    return format;
-}
-
-const levels = {
-    error: 0,
-    warn: 1,
-    info: 2,
-    debug: 3,
-};
-let level = "debug";
-function getLevels() {
-    return levels;
-}
-function getLevel() {
-    return level;
-}
-function setLevel(lvl) {
-    level = isProperty(levels, lvl) ? lvl : level;
-    return level;
+function normalizeTags(tags) {
+    return isArray(tags, ">", 0) ? `[${tags.toString()}] ` : "";
 }
 
 var _a;
-let logger;
-function init(timeZone, locale, service, level) {
-    const dateFormat = setDateFormat(timeZone, locale);
-    const s = setService(service);
-    setLevel(level);
-    setFormat(dateFormat, s);
-    logger = winston.createLogger({
-        level: getLevel(),
-        silent: false,
-        format: getFormat(),
-        levels: getLevels(),
-        transports: setTransports()
-    });
+class Logger {
+    constructor(options) {
+        this.levels = { error: 0, warn: 1, info: 2, debug: 3 };
+        this.colors = {
+            error: '\x1b[31m',
+            warn: '\x1b[33m',
+            info: '\x1b[34m',
+            debug: '\x1b[32m',
+            reset: '\x1b[0m'
+        };
+        this.options = options;
+    }
+    shouldLog(level) {
+        return this.levels[level] <= this.levels[this.options.level];
+    }
+    formatTimestamp() {
+        const tz = this.options.timeZone || "europe/paris";
+        const locale = this.options.locale || "fr-FR";
+        return new Date().toLocaleString(locale, { timeZone: tz });
+    }
+    colorize(level, text) {
+        if (!this.options.colorize)
+            return text;
+        return `${this.colors[level]}${text}${this.colors.reset}`;
+    }
+    formatMessage(entry) {
+        var _a;
+        const service = this.options.service ? `${this.options.service} ` : "";
+        const id = normalizeId(entry.id);
+        const userId = normalizeUser(entry.userId);
+        const tags = normalizeTags(entry.tags);
+        const prefix = `${entry.timestamp} - ${service}${entry.level} - ${id}${userId}${tags}: `;
+        const indent = ' '.repeat(prefix.length);
+        const lines = ((_a = entry.message) === null || _a === void 0 ? void 0 : _a.toString().split(/[\n\r]+/)) || [];
+        const formattedLines = lines.map((line, index) => {
+            const trimmedLine = line.replace(/\s{2,}/g, " ").trim();
+            if (index === 0) {
+                return this.colorize(entry.level, `${prefix}${trimmedLine}`);
+            }
+            else {
+                return this.colorize(entry.level, `${indent}${trimmedLine}`);
+            }
+        });
+        return formattedLines.join('\n');
+    }
+    output(entry) {
+        const formattedMessage = this.formatMessage(entry);
+        if (entry.level === 'error') {
+            console.error(formattedMessage);
+        }
+        else if (entry.level === 'warn') {
+            console.warn(formattedMessage);
+        }
+        else {
+            console.log(formattedMessage);
+        }
+    }
+    log(level, message, id, userId, tags) {
+        if (!this.shouldLog(level))
+            return;
+        const entry = {
+            timestamp: this.formatTimestamp(),
+            level,
+            message,
+            id,
+            userId,
+            tags
+        };
+        this.output(entry);
+    }
+    error(message, id, userId, tags) {
+        this.log('error', message, id, userId, tags);
+    }
+    warn(message, id, userId, tags) {
+        this.log('warn', message, id, userId, tags);
+    }
+    info(message, id, userId, tags) {
+        this.log('info', message, id, userId, tags);
+    }
+    debug(message, id, userId, tags) {
+        this.log('debug', message, id, userId, tags);
+    }
+    setLevel(level) {
+        this.options.level = level;
+    }
+    getLevel() {
+        return this.options.level;
+    }
 }
-const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = (_a = process === null || process === void 0 ? void 0 : process.env) !== null && _a !== void 0 ? _a : null;
-setLevel((NODE_ENV === "prod" || NODE_ENV === "production") ? "info" : "debug");
-init(TZ, LOCALE, SERVICE_NAME, getLevel());
-function print(lvl, msg, info) {
-    if (!isString(msg, "!0"))
-        return;
-    logger[lvl](msg, info);
+let globalLogger;
+function init(timeZone, locale, service, level) {
+    const options = {
+        timeZone,
+        locale,
+        service,
+        level,
+        colorize: true
+    };
+    globalLogger = new Logger(options);
+}
+const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = (_a = process === null || process === void 0 ? void 0 : process.env) !== null && _a !== void 0 ? _a : {};
+const defaultLevel = (NODE_ENV === "prod" || NODE_ENV === "production") ? "info" : "debug";
+init(TZ, LOCALE, SERVICE_NAME, defaultLevel);
+function extractInfoValues(info) {
+    if (!info)
+        return { id: undefined, userId: undefined, tags: undefined };
+    const id = (typeof info.id === 'string' || typeof info.id === 'number') ? info.id : undefined;
+    const userId = (typeof info.userId === 'string' || typeof info.userId === 'number') ? info.userId : undefined;
+    const tags = Array.isArray(info.tags) ? info.tags : undefined;
+    return { id, userId, tags };
 }
 const log = {
     error: (msg, info) => {
-        print('error', msg, info);
+        const { id, userId, tags } = extractInfoValues(info);
+        globalLogger.error(msg, id, userId, tags);
     },
     warn: (msg, info) => {
-        print('warn', msg, info);
+        const { id, userId, tags } = extractInfoValues(info);
+        globalLogger.warn(msg, id, userId, tags);
     },
     info: (msg, info) => {
-        print('info', msg, info);
+        const { id, userId, tags } = extractInfoValues(info);
+        globalLogger.info(msg, id, userId, tags);
     },
     debug: (msg, info) => {
-        print('debug', msg, info);
+        const { id, userId, tags } = extractInfoValues(info);
+        globalLogger.debug(msg, id, userId, tags);
     }
 };
 
-export { init, log };
+export { Logger, init, log };

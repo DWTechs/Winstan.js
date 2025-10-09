@@ -1,8 +1,8 @@
-// src/winstan.ts
+// src/format.ts
 import type { Levels } from "./types";
-import { CustomLogger, LoggerOptions } from "./logger";
+import { Logger, LoggerOptions } from "./winstan";
 
-let log: CustomLogger;
+let log: Logger;
 
 function init(
   timeZone: string | undefined,
@@ -18,7 +18,7 @@ function init(
     colorize: true // Enable colors by default
   };
   
-  log = new CustomLogger(options);
+  log = new Logger(options);
 }
 
 // Initialize with environment variables
