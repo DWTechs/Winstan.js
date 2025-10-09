@@ -49,8 +49,14 @@ $ npm i @dwtechs/winstan
 import { log } from "@dwtechs/winstan";
 
 log.error(`App cannot start: ${err.msg}`);
-log.info(`App started on port : ${PORT}`);
-log.debug(`UpdateOne(user=${JSON.stringify(users)})`);
+log.info(
+  `App started on port : ${PORT}`, 
+  { user: "System" }
+);
+log.debug(
+  `Update one(user=${JSON.stringify(users)})`, 
+  { user: "admin", tags: ["user", "update"] }
+);
 
 ```
 
@@ -72,19 +78,19 @@ Winstan will start with the following default configuration :
   let locale = "fr-FR";
   let timeZone = "europe/paris";
   let level = "debug";
+  let serviceName = "";
 ```
-
-**DefaultService** is the service name. (Or the application name)
-If provided, it will appear at the beginning of every log.
+- **level** is the log level to display.  
+- **locale** is the locale configuration to set date and time to your region.  
+- **timeZone** is the timezone configuration to set time to your region.  
+- **serviceName** is the service name. (Or the application name)  
+If provided, it will appear in every log.  
 It is useful in a multi-service or multi-application monitoring tool.
-
-**defaultUser** is the user name or id.
-If provided, it will appear in the message of the log.
-It is useful to know who made the action in a monitoring tool.
 
 You can configure Winstan using 2 methods :
 
 ### Environment variables
+--- 
 
 Four environment variables may be used by Winstan : 
 
@@ -97,20 +103,22 @@ example :
   SERVICE_NAME="ms_user"
 ```
 
+- if **NODE_ENV** is set to "production" or "prod", the log level will be set to **info**.  
+If it is set to any other value, the log level will be set to **debug**.  
+
+- **LOCALE** is the locale configuration to set date and time to your region.  
+
+- **TZ** is the timezone configuration to set time to your region.  
+
+- **SERVICE_NAME** is the service name. (Or the application name)  
+If provided, it will appear in every log.  
+It is useful in a multi-service or multi-application monitoring tool.  
+
 These environment variables will update the default values of the lib at start up.
 So you do not need to init the library in the code.
 
-```javascript
-
-import { log } from "@dwtechs/winstan";
-
-log.info(`App started on port : ${PORT}`);
-
-```
-
-**TZ** is the timezone configuration to set time to your region.
-
 ### init() method
+---
 
 This method will override ENV variables.
 
@@ -118,17 +126,13 @@ This method will override ENV variables.
 
 import { log, init } from "@dwtechs/winstan";
 
-init( 
-  timeZone: "UTC",
-  locale: "fr-FR",
-  service: "ms_user",
-  level: "debug"
-);
+init( "UTC", "fr-FR", "ms_user", "debug" );
 log.info(`App started on port : ${PORT}`);
 
 ```
 
 ### Production mode
+--- 
 
 Possible values for **NODE_ENV** environment variable are "production" and "prod".
 Those values will set Winstan log level to **info**.
@@ -142,55 +146,55 @@ Any other value (like "dev" or "development") will set the log level to **debug*
 
 export type Levels = 'error'|'warn'|'info'|'debug';
 
+/**
+ * Initializes the logging configuration.
+ *
+ * @param timeZone - The time zone to be used for logging timestamps. If undefined, the default time zone will be used.
+ * @param locale - The locale to be used for formatting dates. If undefined, the default locale will be used.
+ * @param service - The name of the service for which the logging is being configured. If undefined, a default service name will be used.
+ * @param level - The logging level to be set. This determines the severity of logs that will be captured.
+ * 
+ * @returns void
+ */
 function init(
-  timeZone: string, // timezone for date and time. Default to europe/paris
-  locale: string, // locale for date and time. Default to fr-FR
-  service: string, // service name. Default to empty string
+  timeZone: string | undefined, // timezone for date and time. Default to europe/paris
+  locale: string | undefined, // locale for date and time. Default to fr-FR
+  service: string | undefined, // service name. Default to empty string
   level: Levels // minimum level to log. default to debug): Logform.Format;
-): Logform.Format;
+): void;
 
 const log: {
   error: (
-    msg: string,
-    id?: string | number | undefined,
-    user?: string | number | undefined,
-    tag?: string | undefined
-  ) => void;
+    msg: string, 
+    info?: Record<string, string | number | string[] | number[]>
+  ): void => {},
   warn: (
     msg: string,
-    id?: string | number | undefined,
-    user?: string | number | undefined,
-    tag?: string | undefined
-  ) => void;
+    info?: Record<string, string | number | string[] | number[]>
+  ): void => {},
   info: (
     msg: string,
-    id?: string | number | undefined,
-    user?: string | number | undefined,
-    tag?: string | undefined
-  ) => void;
+    info?: Record<string, string | number | string[] | number[]>
+  ): void => {},
   debug: (
     msg: string,
-    id?: string | number | undefined,
-    user?: string | number | undefined,
-    tag?: string | undefined
-  ) => void;
+    info?: Record<string, string | number | string[] | number[]>
+  ): void => {},
 };
 
 ```
 
-### Id
+### Info parameter
+---
 
-IDs are often used to uniquely identify requests, sessions, or other entities. Displaying IDs in logs helps in tracing and debugging by providing a way to correlate log entries with specific entities or events.
+You can use this object to add more information to the log like IDs, tags, etc.
 
-### User
-
-User is the name or id of the user who made the action. It is optional and can be used to filter logs in a monitoring tool.
-
-### Tags
-
-Tags are a way to categorize logs. They are optional and can be used to filter logs in a monitoring tool.
-They can be used categorize logs by action, by module, etc.
-
+```javascript
+  log.debug(
+    `Add user(user=${JSON.stringify(users)})`, 
+    { user: userId, tags: ["addUser"] }
+  );
+```
 
 ## Express.js plugins
 

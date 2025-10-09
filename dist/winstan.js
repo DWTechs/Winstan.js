@@ -25,24 +25,22 @@ https://github.com/DWTechs/Winstan.js
 */
 
 import winston from 'winston';
-import { isString, isValidInteger, isArray, isStringOfLength, isProperty } from '@dwtechs/checkard';
+import { isString, isNumber, isArray, isStringOfLength, isProperty } from '@dwtechs/checkard';
 
-function normalizeId(id) {
-    return (isString(id, "!0") || isValidInteger(id, 1)) ? `id: ${id} - ` : "";
-}
-function normalizeUser(user) {
-    return (isString(user, "!0") || isValidInteger(user, 1)) ? `user: ${user} - ` : "";
-}
-function normalizeTags(tags) {
-    return isArray(tags, ">", 0) ? `[${tags.toString()}] ` : "";
-}
-function normalizeLog(msg, id, user, tags) {
-    if (!isString(msg, "!0"))
-        return false;
-    const i = normalizeId(id);
-    const u = normalizeUser(user);
-    const t = normalizeTags(tags);
-    return `${i}${u}${t}${msg}`;
+function normalizeInfo(info) {
+    let m = "";
+    for (const key in info) {
+        if (key === "message" || key === "level")
+            continue;
+        const v = info[key];
+        if (isString(v, "!0"))
+            m += `${key}="${v}" `;
+        if (isNumber(v, true, ">", 0))
+            m += `${key}=${v} `;
+        if (isArray(v, ">", 0))
+            m += `${key}="${v.toString()}" `;
+    }
+    return m;
 }
 
 let format;
@@ -58,11 +56,23 @@ function setTransports() {
     return [new winston.transports.Console()];
 }
 function setFormat(dateFormat, service) {
-    const sn = service ? `${service} ` : "";
+    const sn = service ? `service="${service}" ` : "";
     format = winston.format.combine(winston.format.colorize({ all: true }), winston.format.timestamp({ format: dateFormat }), winston.format.align(), winston.format.printf((info) => {
-        var _a;
-        const msg = (_a = info.message) === null || _a === void 0 ? void 0 : _a.toString().replace(/[\n\r]+/g, "").replace(/\s{2,}/g, " ");
-        return `${info.timestamp} - ${sn}${info.level}: ${msg}`;
+        var _a, _b;
+        const msg = (_b = (_a = info.message) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : "";
+        const i = normalizeInfo(info);
+        if (msg.includes('\n')) {
+            const lines = msg.split('\n');
+            return lines
+                .map((line, idx) => idx === 0
+                ? `${info.level} | ${line.trim()} ${sn}${i}`.trim()
+                : `${' '.repeat(info.level.length)} | ${line.trim()}`)
+                .join('\n');
+        }
+        else {
+            const cleanMsg = msg.replace(/\s{2,}/g, " ").trim();
+            return `${info.level} | ${cleanMsg} ${sn}${i}`;
+        }
     }));
 }
 function getFormat() {
@@ -105,23 +115,23 @@ function init(timeZone, locale, service, level) {
 const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = (_a = process === null || process === void 0 ? void 0 : process.env) !== null && _a !== void 0 ? _a : null;
 setLevel((NODE_ENV === "prod" || NODE_ENV === "production") ? "info" : "debug");
 init(TZ, LOCALE, SERVICE_NAME, getLevel());
-function print(lvl, msg, id, user, tags) {
+function print(lvl, msg, info) {
     if (!isString(msg, "!0"))
         return;
-    logger[lvl](normalizeLog(msg, id, user, tags));
+    logger[lvl](msg, info);
 }
 const log = {
-    error: (msg, id, user, tags) => {
-        print('error', msg, id, user, tags);
+    error: (msg, info) => {
+        print('error', msg, info);
     },
-    warn: (msg, id, user, tags) => {
-        print('warn', msg, id, user, tags);
+    warn: (msg, info) => {
+        print('warn', msg, info);
     },
-    info: (msg, id, user, tags) => {
-        print('info', msg, id, user, tags);
+    info: (msg, info) => {
+        print('info', msg, info);
     },
-    debug: (msg, id, user, tags) => {
-        print('debug', msg, id, user, tags);
+    debug: (msg, info) => {
+        print('debug', msg, info);
     }
 };
 

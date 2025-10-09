@@ -1,11 +1,15 @@
-# 0.5.0 (Sept 20th 2025)
+# 0.5.0 (Oct 09th 2025)
 
 - No longer uses Winston as a dependency
+- Improve log formatting with multi-line capability
+- Update dependencies: 
+    - @dwtechs/checkard: 3.5.1
 
 
-# 0.4.0 (Mar 08th 2025)
+# 0.4.0 (Mar 15th 2025)
 
-- Add user, id and tags properties to the log function
+- Add info property to the log function to add more information to the log if necessary
+- Use Logfmt format for logs
 - Update @dwtechs/checkard dependency to 3.2.3 
 
 
