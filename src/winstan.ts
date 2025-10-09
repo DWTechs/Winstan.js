@@ -39,7 +39,7 @@ class Logger {
     const userId = normalizeUser(entry.userId);
     const tags = normalizeTags(entry.tags);
     
-    const prefix = `${entry.timestamp} - ${service}${entry.level} - ${id}${userId}${tags}: `;
+    const prefix = `${entry.level} - ${entry.timestamp} - ${service}${id}${userId}${tags}: `;
     const indent = ' '.repeat(prefix.length);
     
     // Split message by line breaks and format each line
