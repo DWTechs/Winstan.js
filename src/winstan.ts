@@ -1,7 +1,7 @@
 // src/logger.ts
 import type { Levels } from "./types";
 import type { LogEntry, LoggerOptions } from "./interfaces";
-import { normalizeId, normalizeUser, normalizeTags } from "./normalize";
+import { normalizeInfo } from "./info";
 
 class Logger {
   private options: LoggerOptions;
@@ -22,10 +22,14 @@ class Logger {
     return this.levels[level] <= this.levels[this.options.level];
   }
 
-  private formatTimestamp(): string {
+  private formatTimestamp(): { date: string; time: string } {
     const tz = this.options.timeZone || "europe/paris";
     const locale = this.options.locale || "fr-FR";
-    return new Date().toLocaleString(locale, { timeZone: tz });
+    const now = new Date();
+    const date = now.toLocaleDateString(locale, { timeZone: tz });
+    const time = now.toLocaleTimeString(locale, { timeZone: tz });
+    const ms = now.getMilliseconds().toString().padStart(3, '0');
+    return { date, time: `${time}:${ms}` };
   }
 
   private colorize(level: Levels, text: string): string {
@@ -34,12 +38,13 @@ class Logger {
   }
 
   private formatMessage(entry: LogEntry): string {
-    const service = this.options.service ? `${this.options.service} ` : "";
-    const id = normalizeId(entry.id);
-    const userId = normalizeUser(entry.userId);
-    const tags = normalizeTags(entry.tags);
+    const service = this.options.service ? `service="${this.options.service}" ` : "";
+    const info = normalizeInfo(entry as any);
+    const { date, time } = entry.timestamp as any;
     
-    const prefix = `${entry.level} - ${entry.timestamp} - ${service}${id}${userId}${tags}: `;
+    // Pad level to 5 characters (length of "debug" and "error")
+    const paddedLevel = entry.level.padEnd(5, ' ');
+    const prefix = `${paddedLevel} | date=${date} time=${time} `;
     const indent = ' '.repeat(prefix.length);
     
     // Split message by line breaks and format each line
@@ -47,7 +52,7 @@ class Logger {
     const formattedLines = lines.map((line, index) => {
       const trimmedLine = line.replace(/\s{2,}/g, " ").trim();
       if (index === 0) {
-        return this.colorize(entry.level, `${prefix}${trimmedLine}`);
+        return this.colorize(entry.level, `${prefix}${trimmedLine} ${service}${info}`.trim());
       } else {
         return this.colorize(entry.level, `${indent}${trimmedLine}`);
       }
@@ -69,35 +74,33 @@ class Logger {
     }
   }
 
-  private log(level: Levels, message: string, id?: string | number, userId?: string | number, tags?: string[] | number[]): void {
+  private log(level: Levels, message: string, info?: Record<string, string | number | string[] | number[]>): void {
     if (!this.shouldLog(level)) return;
 
     const entry: LogEntry = {
       timestamp: this.formatTimestamp(),
       level,
       message,
-      id,
-      userId,
-      tags
+      ...info
     };
 
     this.output(entry);
   }
 
-  error(message: string, id?: string | number, userId?: string | number, tags?: string[] | number[]): void {
-    this.log('error', message, id, userId, tags);
+  error(message: string, info?: Record<string, string | number | string[] | number[]>): void {
+    this.log('error', message, info);
   }
 
-  warn(message: string, id?: string | number, userId?: string | number, tags?: string[] | number[]): void {
-    this.log('warn', message, id, userId, tags);
+  warn(message: string, info?: Record<string, string | number | string[] | number[]>): void {
+    this.log('warn', message, info);
   }
 
-  info(message: string, id?: string | number, userId?: string | number, tags?: string[] | number[]): void {
-    this.log('info', message, id, userId, tags);
+  info(message: string, info?: Record<string, string | number | string[] | number[]>): void {
+    this.log('info', message, info);
   }
 
-  debug(message: string, id?: string | number, userId?: string | number, tags?: string[] | number[]): void {
-    this.log('debug', message, id, userId, tags);
+  debug(message: string, info?: Record<string, string | number | string[] | number[]>): void {
+    this.log('debug', message, info);
   }
 
   // Method to update log level dynamically
@@ -147,46 +150,31 @@ const defaultLevel: Levels = (NODE_ENV === "prod" || NODE_ENV === "production") 
 // Initialize global logger
 init(TZ, LOCALE, SERVICE_NAME, defaultLevel);
 
-// Helper function to extract values from info object
-function extractInfoValues(info?: Record<string, string | number | string[] | number[]>) {
-  if (!info) return { id: undefined, userId: undefined, tags: undefined };
-  
-  const id = (typeof info.id === 'string' || typeof info.id === 'number') ? info.id : undefined;
-  const userId = (typeof info.userId === 'string' || typeof info.userId === 'number') ? info.userId : undefined;
-  const tags = Array.isArray(info.tags) ? info.tags : undefined;
-  
-  return { id, userId, tags };
-}
-
 // Export log interface matching README API
 const log = {
   error: (
     msg: string,
     info?: Record<string, string | number | string[] | number[]>
   ) => {
-    const { id, userId, tags } = extractInfoValues(info);
-    globalLogger.error(msg, id, userId, tags);
+    globalLogger.error(msg, info);
   },
   warn: (
     msg: string,
     info?: Record<string, string | number | string[] | number[]>
   ) => {
-    const { id, userId, tags } = extractInfoValues(info);
-    globalLogger.warn(msg, id, userId, tags);
+    globalLogger.warn(msg, info);
   },
   info: (
     msg: string,
     info?: Record<string, string | number | string[] | number[]>
   ) => {
-    const { id, userId, tags } = extractInfoValues(info);
-    globalLogger.info(msg, id, userId, tags);
+    globalLogger.info(msg, info);
   },
   debug: (
     msg: string,
     info?: Record<string, string | number | string[] | number[]>
   ) => {
-    const { id, userId, tags } = extractInfoValues(info);
-    globalLogger.debug(msg, id, userId, tags);
+    globalLogger.debug(msg, info);
   }
 };
 

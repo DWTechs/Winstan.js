@@ -1,7 +1,7 @@
 import type { Levels } from "./types";
 
 interface LogEntry {
-  timestamp: string;
+  timestamp: string | { date: string; time: string };
   level: Levels;
   service?: string;
   message: string;

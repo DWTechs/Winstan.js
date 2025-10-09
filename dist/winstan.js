@@ -24,16 +24,22 @@ SOFTWARE.
 https://github.com/DWTechs/Winstan.js
 */
 
-import { isString, isValidInteger, isArray } from '@dwtechs/checkard';
+import { isString, isNumber, isArray } from '@dwtechs/checkard';
 
-function normalizeId(id) {
-    return (isString(id, "!0") || isValidInteger(id, 1)) ? `id: ${id} - ` : "";
-}
-function normalizeUser(user) {
-    return (isString(user, "!0") || isValidInteger(user, 1)) ? `user: ${user} - ` : "";
-}
-function normalizeTags(tags) {
-    return isArray(tags, ">", 0) ? `[${tags.toString()}] ` : "";
+function normalizeInfo(info) {
+    let m = "";
+    for (const key in info) {
+        if (key === "message" || key === "level")
+            continue;
+        const v = info[key];
+        if (isString(v, "!0"))
+            m += `${key}="${v}" `;
+        if (isNumber(v, true, ">", 0))
+            m += `${key}=${v} `;
+        if (isArray(v, ">", 0))
+            m += `${key}="${v.toString()}" `;
+    }
+    return m;
 }
 
 var _a;
@@ -55,7 +61,11 @@ class Logger {
     formatTimestamp() {
         const tz = this.options.timeZone || "europe/paris";
         const locale = this.options.locale || "fr-FR";
-        return new Date().toLocaleString(locale, { timeZone: tz });
+        const now = new Date();
+        const date = now.toLocaleDateString(locale, { timeZone: tz });
+        const time = now.toLocaleTimeString(locale, { timeZone: tz });
+        const ms = now.getMilliseconds().toString().padStart(3, '0');
+        return { date, time: `${time}:${ms}` };
     }
     colorize(level, text) {
         if (!this.options.colorize)
@@ -64,17 +74,17 @@ class Logger {
     }
     formatMessage(entry) {
         var _a;
-        const service = this.options.service ? `${this.options.service} ` : "";
-        const id = normalizeId(entry.id);
-        const userId = normalizeUser(entry.userId);
-        const tags = normalizeTags(entry.tags);
-        const prefix = `${entry.timestamp} - ${service}${entry.level} - ${id}${userId}${tags}: `;
+        const service = this.options.service ? `service="${this.options.service}" ` : "";
+        const info = normalizeInfo(entry);
+        const { date, time } = entry.timestamp;
+        const paddedLevel = entry.level.padEnd(5, ' ');
+        const prefix = `${paddedLevel} | date=${date} time=${time} `;
         const indent = ' '.repeat(prefix.length);
         const lines = ((_a = entry.message) === null || _a === void 0 ? void 0 : _a.toString().split(/[\n\r]+/)) || [];
         const formattedLines = lines.map((line, index) => {
             const trimmedLine = line.replace(/\s{2,}/g, " ").trim();
             if (index === 0) {
-                return this.colorize(entry.level, `${prefix}${trimmedLine}`);
+                return this.colorize(entry.level, `${prefix}${trimmedLine} ${service}${info}`.trim());
             }
             else {
                 return this.colorize(entry.level, `${indent}${trimmedLine}`);
@@ -94,30 +104,24 @@ class Logger {
             console.log(formattedMessage);
         }
     }
-    log(level, message, id, userId, tags) {
+    log(level, message, info) {
         if (!this.shouldLog(level))
             return;
-        const entry = {
-            timestamp: this.formatTimestamp(),
-            level,
-            message,
-            id,
-            userId,
-            tags
-        };
+        const entry = Object.assign({ timestamp: this.formatTimestamp(), level,
+            message }, info);
         this.output(entry);
     }
-    error(message, id, userId, tags) {
-        this.log('error', message, id, userId, tags);
+    error(message, info) {
+        this.log('error', message, info);
     }
-    warn(message, id, userId, tags) {
-        this.log('warn', message, id, userId, tags);
+    warn(message, info) {
+        this.log('warn', message, info);
     }
-    info(message, id, userId, tags) {
-        this.log('info', message, id, userId, tags);
+    info(message, info) {
+        this.log('info', message, info);
     }
-    debug(message, id, userId, tags) {
-        this.log('debug', message, id, userId, tags);
+    debug(message, info) {
+        this.log('debug', message, info);
     }
     setLevel(level) {
         this.options.level = level;
@@ -140,30 +144,18 @@ function init(timeZone, locale, service, level) {
 const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = (_a = process === null || process === void 0 ? void 0 : process.env) !== null && _a !== void 0 ? _a : {};
 const defaultLevel = (NODE_ENV === "prod" || NODE_ENV === "production") ? "info" : "debug";
 init(TZ, LOCALE, SERVICE_NAME, defaultLevel);
-function extractInfoValues(info) {
-    if (!info)
-        return { id: undefined, userId: undefined, tags: undefined };
-    const id = (typeof info.id === 'string' || typeof info.id === 'number') ? info.id : undefined;
-    const userId = (typeof info.userId === 'string' || typeof info.userId === 'number') ? info.userId : undefined;
-    const tags = Array.isArray(info.tags) ? info.tags : undefined;
-    return { id, userId, tags };
-}
 const log = {
     error: (msg, info) => {
-        const { id, userId, tags } = extractInfoValues(info);
-        globalLogger.error(msg, id, userId, tags);
+        globalLogger.error(msg, info);
     },
     warn: (msg, info) => {
-        const { id, userId, tags } = extractInfoValues(info);
-        globalLogger.warn(msg, id, userId, tags);
+        globalLogger.warn(msg, info);
     },
     info: (msg, info) => {
-        const { id, userId, tags } = extractInfoValues(info);
-        globalLogger.info(msg, id, userId, tags);
+        globalLogger.info(msg, info);
     },
     debug: (msg, info) => {
-        const { id, userId, tags } = extractInfoValues(info);
-        globalLogger.debug(msg, id, userId, tags);
+        globalLogger.debug(msg, info);
     }
 };
 
