@@ -12,10 +12,10 @@ interface LogEntry {
 }
 
 interface LoggerOptions {
+  level?: Levels;
   timeZone?: string;
   locale?: string;
   service?: string;
-  level: Levels;
   colorize?: boolean;
 }
 

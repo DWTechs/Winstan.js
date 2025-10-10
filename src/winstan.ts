@@ -2,11 +2,11 @@
 import type { Levels } from "./types";
 import type { LogEntry, LoggerOptions } from "./interfaces";
 import { normalizeInfo } from "./info";
+import { getLevels } from "./level";
 
 class Logger {
-  private options: LoggerOptions;
-  private levels = { error: 0, warn: 1, info: 2, debug: 3 };
-  private colors = {
+  #options: Required<LoggerOptions>;
+  #colors = {
     error: '\x1b[31m',   // Red
     warn: '\x1b[33m',    // Yellow
     info: '\x1b[34m',    // Blue
@@ -14,31 +14,38 @@ class Logger {
     reset: '\x1b[0m'     // Reset
   };
 
-  constructor(options: LoggerOptions) {
-    this.options = options;
+  constructor(options: LoggerOptions = {}) {
+
+    this.#options = {
+      level: options.level ? options.level : 'debug',
+      timeZone: options.timeZone ? options.timeZone : 'Europe/Paris',
+      locale: options.locale ? options.locale : 'fr-FR',
+      service: options.service ? options.service : undefined,
+      colorize: options.colorize ? options.colorize : true,
+      
+    } as Required<LoggerOptions>;
   }
 
-  private shouldLog(level: Levels): boolean {
-    return this.levels[level] <= this.levels[this.options.level];
+  #shouldLog(level: Levels): boolean {
+    const levels = getLevels();
+    return levels[level] <= levels[this.#options.level];
   }
 
-  private formatTimestamp(): { date: string; time: string } {
-    const tz = this.options.timeZone || "europe/paris";
-    const locale = this.options.locale || "fr-FR";
+  #formatTimestamp(): { date: string; time: string } {
     const now = new Date();
-    const date = now.toLocaleDateString(locale, { timeZone: tz });
-    const time = now.toLocaleTimeString(locale, { timeZone: tz });
+    const date = now.toLocaleDateString(this.#options.locale, { timeZone: this.#options.timeZone });
+    const time = now.toLocaleTimeString(this.#options.locale, { timeZone: this.#options.timeZone });
     const ms = now.getMilliseconds().toString().padStart(3, '0');
     return { date, time: `${time}:${ms}` };
   }
 
-  private colorize(level: Levels, text: string): string {
-    if (!this.options.colorize) return text;
-    return `${this.colors[level]}${text}${this.colors.reset}`;
+  #colorize(level: Levels, text: string): string {
+    if (!this.#options.colorize) return text;
+    return `${this.#colors[level]}${text}${this.#colors.reset}`;
   }
 
-  private formatMessage(entry: LogEntry): string {
-    const service = this.options.service ? `service="${this.options.service}" ` : "";
+  #formatMessage(entry: LogEntry): string {
+    const service = this.#options.service ? `service="${this.#options.service}" ` : "";
     const info = normalizeInfo(entry as any);
     const { date, time } = entry.timestamp as any;
     
@@ -52,17 +59,17 @@ class Logger {
     const formattedLines = lines.map((line, index) => {
       const trimmedLine = line.replace(/\s{2,}/g, " ").trim();
       if (index === 0) {
-        return this.colorize(entry.level, `${prefix}${trimmedLine} ${service}${info}`.trim());
+        return this.#colorize(entry.level, `${prefix}${trimmedLine} ${service}${info}`.trim());
       } else {
-        return this.colorize(entry.level, `${indent}${trimmedLine}`);
+        return this.#colorize(entry.level, `${indent}${trimmedLine}`);
       }
     });
     
     return formattedLines.join('\n');
   }
 
-  private output(entry: LogEntry): void {
-    const formattedMessage = this.formatMessage(entry);
+  #output(entry: LogEntry): void {
+    const formattedMessage = this.#formatMessage(entry);
     
     // Output to console
     if (entry.level === 'error') {
@@ -74,42 +81,42 @@ class Logger {
     }
   }
 
-  private log(level: Levels, message: string, info?: Record<string, string | number | string[] | number[]>): void {
-    if (!this.shouldLog(level)) return;
+  #log(level: Levels, message: string, info?: Record<string, string | number | string[] | number[]>): void {
+    if (!this.#shouldLog(level)) return;
 
     const entry: LogEntry = {
-      timestamp: this.formatTimestamp(),
+      timestamp: this.#formatTimestamp(),
       level,
       message,
       ...info
     };
 
-    this.output(entry);
+    this.#output(entry);
   }
 
   error(message: string, info?: Record<string, string | number | string[] | number[]>): void {
-    this.log('error', message, info);
+    this.#log('error', message, info);
   }
 
   warn(message: string, info?: Record<string, string | number | string[] | number[]>): void {
-    this.log('warn', message, info);
+    this.#log('warn', message, info);
   }
 
   info(message: string, info?: Record<string, string | number | string[] | number[]>): void {
-    this.log('info', message, info);
+    this.#log('info', message, info);
   }
 
   debug(message: string, info?: Record<string, string | number | string[] | number[]>): void {
-    this.log('debug', message, info);
+    this.#log('debug', message, info);
   }
 
   // Method to update log level dynamically
   setLevel(level: Levels): void {
-    this.options.level = level;
+    this.#options.level = level;
   }
 
   getLevel(): Levels {
-    return this.options.level;
+    return this.#options.level || 'debug';
   }
 }
 
@@ -119,25 +126,24 @@ let globalLogger: Logger;
 /**
  * Initializes the logging configuration.
  *
- * @param timeZone - The time zone to be used for logging timestamps. If undefined, the default time zone will be used.
- * @param locale - The locale to be used for formatting dates. If undefined, the default locale will be used.
- * @param service - The name of the service for which the logging is being configured. If undefined, a default service name will be used.
- * @param level - The logging level to be set. This determines the severity of logs that will be captured.
+ * @param timeZone - The time zone to be used for logging timestamps. Defaults to 'Europe/Paris'.
+ * @param locale - The locale to be used for formatting dates. Defaults to 'fr-FR'.
+ * @param service - The name of the service for which the logging is being configured. Defaults to undefined (no service name).
+ * @param level - The logging level to be set. This determines the severity of logs that will be captured. Defaults to 'debug'.
  * 
  * @returns void
  */
 function init(
-  timeZone: string | undefined,
-  locale: string | undefined,
-  service: string | undefined,
-  level: Levels
+  timeZone?: string,
+  locale?: string,
+  service?: string,
+  level?: Levels
 ): void {
   const options: LoggerOptions = {
     timeZone,
     locale,
     service,
-    level,
-    colorize: true
+    level
   };
   
   globalLogger = new Logger(options);
