@@ -1,1 +1,1 @@
-export type Levels = 'error'|'warn'|'info'|'debug';
+export type Level = 'error'|'warn'|'info'|'debug';
