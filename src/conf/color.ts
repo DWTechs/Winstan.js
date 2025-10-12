@@ -1,24 +1,25 @@
-import type { Level } from "./types";
-import { isObject, isProperty, isString } from "@dwtechs/checkard";
+import type { Level } from "../types";
+import { isObject, isProperty, isString, isBoolean } from "@dwtechs/checkard";
+
+// check for env variables
+const { COLORIZE } = process?.env ?? null;
 
 const colors = {
   error: '\x1b[31m',   // Red
   warn: '\x1b[33m',    // Yellow
   info: '\x1b[34m',    // Blue
   debug: '\x1b[32m',   // Green
-  reset: '\x1b[0m'     // Reset
 };
+const reset = '\x1b[0m';
+
+let colorize = true;
 
 // Regex to validate ANSI escape codes
 // Matches patterns like \x1b[31m, \x1b[0m, \x1b[1;32m, etc.
 const ansiColorRegex = /^\\x1b\[\d+(;\d+)*m$/;
 
-function isAnsiColor(v: string): boolean {
+function isAnsiColor(v: unknown): v is string {
   return isString(v, "!0") && ansiColorRegex.test(v);
-}
-
-function getColors(): Record<string, string> {
-  return colors;
 }
 
 function getColor(level:Level): string {
@@ -38,8 +39,18 @@ function setColors(newColors: Partial<Record<string, string>>): void {
   }
 }
 
+function setColorize(v: boolean): boolean {
+  if (isBoolean(v))
+    colorize = v;
+  return colorize;
+}
+
+
 export { 
-  getColors, 
-  getColor, 
-  setColors
+  colors,
+  reset,
+  colorize,
+  getColor,
+  setColors,
+  setColorize,
 };

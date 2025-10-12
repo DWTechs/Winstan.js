@@ -1,6 +1,6 @@
 // src/format.ts
-import type { Levels } from "./types";
-import { Logger, LoggerOptions } from "./winstan";
+import type { Levels } from "../types";
+import { Logger, LoggerOptions } from "../winstan";
 
 let log: Logger;
 
@@ -40,7 +40,5 @@ function init(
 // Initialize with environment variables
 const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = process?.env ?? {};
 const defaultLevel: Levels = (NODE_ENV === "prod" || NODE_ENV === "production") ? "info" : "debug";
-
-init(TZ, LOCALE, SERVICE_NAME, defaultLevel);
 
 export { init, log };

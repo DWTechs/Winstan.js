@@ -1,4 +1,4 @@
-import type { Level } from "./types";
+import type { Level } from "../types";
 import { isProperty } from "@dwtechs/checkard";
 
 // check for env variables
@@ -29,10 +29,16 @@ function setLevel(lvl: Level): Level {
   return level;
 }
 
+function shouldLog(lev: Level): boolean {
+  const levels = getLevels();
+  return levels[lev] <= levels[level];
+}
+
 setLevel((NODE_ENV === "prod" || NODE_ENV === "production") ? prod : dev);
 
 export {
   getLevels,
   getLevel,
-  setLevel
+  setLevel,
+  shouldLog,
 }

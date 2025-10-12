@@ -1,4 +1,4 @@
-import type { Levels } from "./types";
+import type { Levels } from "../types";
 
 interface LogEntry {
   timestamp: string | { date: string; time: string };

@@ -9,15 +9,11 @@ const dTimeZone = 'Europe/Paris';
 // Format: Region/City or Region/SubRegion/City
 const timeZoneRegex = /^[A-Z][a-z]+\/[A-Z][a-z_]+(?:\/[A-Z][a-z_]+)?$/;
 
-function isTimeZone(v: string): boolean {
+function isTimeZone(v: unknown): v is string {
   return isString(v, "!0") && timeZoneRegex.test(v);
 }
 
 let timeZone: string = isTimeZone(TZ) ? TZ : dTimeZone;
-
-function getTimeZone(): string {
-  return timeZone;
-}
 
 function setTimeZone(tz: string): string {
   if (isTimeZone(tz))
@@ -25,4 +21,4 @@ function setTimeZone(tz: string): string {
   return timeZone;
 }
 
-export { getTimeZone, setTimeZone };
+export { timeZone, setTimeZone };

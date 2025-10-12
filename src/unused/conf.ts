@@ -1,6 +1,5 @@
 // Module-level state
 
-
 const dTimeZone = 'Europe/Paris';
 const dLocale = 'fr-FR';
 const dService = undefined;
@@ -8,7 +7,6 @@ const dColorize = true;
 
 // check for env variables
 const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = process?.env ?? null;
-
 
 
 function setDateFormat(timeZone: string | undefined, locale: string | undefined): string { 

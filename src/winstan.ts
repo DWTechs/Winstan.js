@@ -1,15 +1,9 @@
 // src/logger.ts
-import type { Levels } from "./types";
-import type { LogEntry, LoggerOptions } from "./interfaces";
-import { normalizeInfo } from "./info";
-import { getLevels } from "./level";
+import type { Level } from "./types";
+// import type { LogEntry, LoggerOptions } from "./unused/interfaces";
+// import { normalizeInfo } from "./unused/info";
+import { getLevels } from "./conf/level";
 
-
-// Private helper functions
-function shouldLog(level: Levels): boolean {
-  const levels = getLevels();
-  return levels[level] <= levels[options.level];
-}
 
 function formatTimestamp(): { date: string; time: string } {
   const now = new Date();
@@ -17,11 +11,6 @@ function formatTimestamp(): { date: string; time: string } {
   const time = now.toLocaleTimeString(options.locale, { timeZone: options.timeZone });
   const ms = now.getMilliseconds().toString().padStart(3, '0');
   return { date, time: `${time}:${ms}` };
-}
-
-function colorize(level: Levels, text: string): string {
-  if (!options.colorize) return text;
-  return `${colors[level]}${text}${colors.reset}`;
 }
 
 function formatMessage(entry: LogEntry): string {

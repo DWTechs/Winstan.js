@@ -10,15 +10,11 @@ const localeRegex = /^[a-z]{2}-[A-Z]{2}$/;
 // Extended locale format supporting scripts and variants
 const extendedLocaleRegex = /^[a-z]{2,3}(-[A-Z][a-z]{3})?(-[A-Z]{2})?(-[a-zA-Z0-9]+)*$/;
 
-function isLocale(v: string, ext: boolean = false): boolean {
-  return (ext ? extendedLocaleRegex.test(v) : isString(v, "=", 5) && localeRegex.test(v));
+function isLocale(v: unknown, ext: boolean = false): v is string {
+  return (isString(v, "!0") && (ext ? extendedLocaleRegex.test(v) : isString(v, "=", 5) && localeRegex.test(v)));
 }
 
 let locale: string = isLocale(LOCALE) ? LOCALE : def;
-
-function getLocale(): string {
-  return locale;
-}
 
 function setLocale(loc: string): string {
   if (isLocale(loc))
@@ -26,4 +22,4 @@ function setLocale(loc: string): string {
   return locale;
 }
 
-export { getLocale, setLocale };
+export { locale, setLocale };
