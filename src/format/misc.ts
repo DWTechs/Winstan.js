@@ -11,22 +11,20 @@ interface TransformableInfo {
   level?: string;
 }
 
-function normalizeInfo(info: TransformableInfo): string {
+function formatMisc(info: TransformableInfo): string {
   let m = "";
   for (const key in info) {
     if (key === "message" || key === "level")
       continue;
     const v = info[key];
-    if (isString(v, "!0"))
-      m += `${key}="${v}" `;
-    if (isNumber(v, true, ">", 0))
-      m += `${key}=${v} `;
-    if (isArray(v, ">", 0))
-      m += `${key}="${v.toString()}" `;
+    if (isString(v, "!0") || isNumber(v, false))
+      m += `${key}="${v}" - `;
+    else if (isArray(v, ">", 0))
+      m += `${key}=["${v.toString()}]" - `;
   }
   return m;
 }
 
 export {
-  normalizeInfo
+  formatMisc
 }
