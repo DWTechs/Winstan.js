@@ -4,19 +4,13 @@ import {
   isArray
 } from "@dwtechs/checkard";
 
-// Custom type to replace winston's Logform.TransformableInfo
-interface TransformableInfo {
-  [key: string]: any;
-  message?: string;
-  level?: string;
-}
 
-function formatMisc(info: TransformableInfo): string {
+function formatMisc(ctx: Record<string, string | number | string[] | number[]>): string {
   let m = "";
-  for (const key in info) {
+  for (const key in ctx) {
     if (key === "message" || key === "level")
       continue;
-    const v = info[key];
+    const v = ctx[key];
     if (isString(v, "!0") || isNumber(v, false))
       m += `${key}="${v}" - `;
     else if (isArray(v, ">", 0))

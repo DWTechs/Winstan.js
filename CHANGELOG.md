@@ -2,8 +2,14 @@
 
 - No longer uses Winston as a dependency
 - Improve log formatting with multi-line capability
-- Update dependencies: 
-    - @dwtechs/checkard: 3.5.1
+- Update @dwtechs/checkard dependancy to 3.6.0
+- New initialisation functions : 
+    - setLevel()
+    - setColors()
+    - setLocale()
+    - setTimeZone()
+    - setService()
+
 
 
 # 0.4.0 (Mar 15th 2025)

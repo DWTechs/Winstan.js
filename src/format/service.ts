@@ -1,6 +1,6 @@
 import { getService } from "../conf/service";
 
-function formatService(srv?: string): string {
+function formatService(): string {
   return getService() ? `service="${getService()}" ` : "";
 }
 

@@ -1,5 +1,5 @@
 import type { Level } from "../types";
-import { isObject, isProperty, isAnsiColor } from "@dwtechs/checkard";
+import { isObject, isProperty, isAnsiEscapeCode } from "@dwtechs/checkard";
 
 const colors = {
   error: '\x1b[31m',   // Red
@@ -8,27 +8,19 @@ const colors = {
   debug: '\x1b[32m',   // Green
 };
 
-// // Regex to validate ANSI escape codes
-// // Matches patterns like \x1b[31m, \x1b[0m, \x1b[1;32m, etc.
-// const ansiColorRegex = /^\\x1b\[\d+(;\d+)*m$/;
-
-// function isAnsiColor(v: unknown): v is string {
-//   return isString(v, "!0") && ansiColorRegex.test(v);
-// }
-
 function getColor(level:Level): string {
-  return colors[level];
+  return colors[level] || '';
 }
 
-function setColors(newColors: Partial<Record<string, string>>): void {
-  // Validate that newColors is a valid object
-  if (!isObject(newColors))
+function setColors(newColors: Partial<Record<string, string>> | null): void {
+  // Validate that newColors is a valid object or null
+  if (!isObject(newColors) && newColors !== null)
     return;
 
   // Only update colors that exist in the original colors object and have valid ANSI codes
   for (const key in newColors) {
     const v = newColors[key];
-    if (isProperty(colors, key) && isAnsiColor(v))
+    if (isProperty(colors, key) && isAnsiEscapeCode(v))
       colors[key] = v;
   }
 }

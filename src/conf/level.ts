@@ -1,7 +1,6 @@
 import type { Level } from "../types";
 import { isProperty } from "@dwtechs/checkard";
 
-// check for env variables
 const { NODE_ENV } = process?.env ?? null;
 
 const dev = "debug";
