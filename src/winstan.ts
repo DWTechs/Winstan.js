@@ -5,13 +5,6 @@ import type { Level } from "./types";
 import { getLevels } from "./conf/level";
 
 
-function formatTimestamp(): { date: string; time: string } {
-  const now = new Date();
-  const date = now.toLocaleDateString(options.locale, { timeZone: options.timeZone });
-  const time = now.toLocaleTimeString(options.locale, { timeZone: options.timeZone });
-  const ms = now.getMilliseconds().toString().padStart(3, '0');
-  return { date, time: `${time}:${ms}` };
-}
 
 function formatMessage(entry: LogEntry): string {
   const service = options.service ? `service="${options.service}" ` : "";
