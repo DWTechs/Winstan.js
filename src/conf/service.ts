@@ -10,4 +10,8 @@ function setService(srv: string): string {
   return service;
 }
 
-export { service, setService };
+function getService(): string {
+  return service;
+}
+
+export { setService, getService };
