@@ -1,33 +1,67 @@
 import { isString } from "@dwtechs/checkard";
 import { shouldLog } from "./conf/level.js";
 import { formatMisc } from "./format/misc.js";
-import { formatTimestamp } from "./format/timestamp.js";
-import { formatService } from "./format/service.js";
 import { formatColor } from "./format/color.js";
+import { formatDate } from "./format/date.js";
+import { formatTxt } from "./format/txt.js";
 import type { Level } from "./types";
 
-function formatMessage(lvl: Level, msg: string, ctx?: Record<string, string | number | string[] | number[]>): string {
-  
-  const service = formatService();
-  const misc = formatMisc(ctx);
+// Check environment for output format
+const isProduction = process?.env?.NODE_ENV === "production" || process?.env?.NODE_ENV === "prod";
 
-  // Pad level to 5 characters (length of "debug" and "error")
-  const paddedLevel = lvl.padEnd(5, ' ');
-  const ts = formatTimestamp();
-  const prefix = `${paddedLevel} | ${ts} `;
-  const indent = ' '.repeat(prefix.length);
+function msg(lvl: Level, txt: string, ctx: Record<string, string | number | string[] | number[]>): string {
   
-  // Split message by line breaks and format each line
-  const lines = msg?.toString().split(/[\n\r]+/) || [];
-  const formattedLines = lines.map((l, i) => {
-    const trimmedLine = l.replace(/\s{2,}/g, " ").trim();
-    if (!i)
-      return formatColor(lvl, `${prefix}${trimmedLine} ${service}${misc}`.trim());
-    else
-      return formatColor(lvl, `${indent}${trimmedLine}`);
-  });
+  const ts = formatDate();
+  const misc = formatMisc(ctx);
   
-  return formattedLines.join('\n');
+  // Production format: pure logfmt (single line with escaped newlines)
+  if (isProduction) {
+    let logfmtLine = `time=${ts} level=${lvl}`;
+    
+    // Add context fields using formatMisc
+    if (misc)
+      logfmtLine += ` ${misc}`;
+
+    // Add message (with escaped newlines for pure logfmt compliance)
+    const formattedTxt = formatTxt(txt);
+    logfmtLine += ` msg=${formattedTxt}`;
+    
+    return formatColor(lvl, logfmtLine);
+  }
+  
+  // Development format (default): human-readable multiline
+  const lines = txt?.toString().split(/[\n\r]+/) || [];
+  if (lines.length > 1) {
+    let result = '';
+    lines.forEach((line, i) => {
+      const trimmedLine = line.replace(/\s{2,}/g, " ").trim();
+      if (i === 0) {
+        // First line uses the full context
+        let firstLine = `time=${ts} level=${lvl}`;
+        if (misc)
+          firstLine += ` ${misc}`;
+        firstLine += ` msg=${formatTxt(trimmedLine)}`;
+        result += formatColor(lvl, firstLine);
+      } else {
+        // Subsequent lines are indented for better readability
+        result += '\n' + formatColor(lvl, `  ${trimmedLine}`);
+      }
+    });
+    return result;
+  }
+  
+  // Single line in development mode
+  let logfmtLine = `time=${ts} level=${lvl}`;
+  
+  // Add message (no escaping in development for readability)
+  const formattedTxt = formatTxt(txt);
+  logfmtLine += ` msg=${formattedTxt}`;
+
+  // Add context fields using formatMisc
+  if (misc)
+    logfmtLine += ` ${misc}`;
+  
+  return formatColor(lvl, logfmtLine);
 }
 
 
@@ -41,17 +75,17 @@ function formatMessage(lvl: Level, msg: string, ctx?: Record<string, string | nu
 
 function print(
   lvl: Level,
-  msg: string,
+  txt: string,
   ctx?: Record<string, string | number | string[] | number[]>
 ): void {
   
   if (!shouldLog(lvl))
     return;
 
-  if (!isString(msg, "!0"))
+  if (!isString(txt, "!0"))
     return;
   
-  const m = formatMessage(lvl, msg, ctx);
+  const m = msg(lvl, txt, ctx || {});
   
   // Output to console
   if (lvl === 'error')
@@ -65,30 +99,30 @@ function print(
 
 const log = {
   error: (
-    msg: string,
+    txt: string,
     ctx?: Record<string, string | number | string[] | number[]>,
   ) => {
-    print('error', msg, ctx);
+    print('error', txt, ctx);
   },
   warn: (
-    msg: string,
+    txt: string,
     ctx?: Record<string, string | number | string[] | number[]>,
   ) => {
-    print('warn', msg, ctx);
+    print('warn', txt, ctx);
   },
   info: (
-    msg: string,
+    txt: string,
     ctx?: Record<string, string | number | string[] | number[]>,
   ) => {
-    print('info', msg, ctx);
+    print('info', txt, ctx);
   },
   debug: (
-    msg: string,
+    txt: string,
     ctx?: Record<string, string | number | string[] | number[]>,
   ) => {
-    print('debug', msg, ctx);
+    print('debug', txt, ctx);
   }
 };
 
 
-export { log };
+export { log, msg };

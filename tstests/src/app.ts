@@ -1,6 +1,6 @@
-import { init, log } from "../../dist/winstan.js";
+import { log } from "../../dist/winstan.js";
 
-init("europe/paris","fr-FR","ms-user","debug");
+// init("europe/paris","fr-FR","ms-user","debug");
 log.error("App did not start");
 log.warn("App did not start properly");
 log.info("App started on port : 3000");
@@ -31,6 +31,6 @@ log.info(`Entity Summary Test:
 │  └─ email:
 │      ├─ Type: string
 │      └─ Operations: [SELECT, INSERT]
-└─ Entity initialization completed`);
+└─ Entity initialization completed`, { requestId: 4554645, userId: 45, tags: ["update", "user"] });
 log.debug("Debug with empty lines:\nLine 1\n\nLine 3\n\nLine 5");
 console.log("=== Line Break Tests Completed ===");

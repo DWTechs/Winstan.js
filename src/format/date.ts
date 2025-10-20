@@ -1,6 +1,6 @@
 // Module-level state
 import { locale } from "../conf/locale";
-import { timeZone } from "../conf/timezone";
+import { timeZone } from "../conf/tz";
 
 function formatDate(): string {
   const now = new Date();
