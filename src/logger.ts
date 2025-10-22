@@ -6,13 +6,13 @@ import { formatDate } from "./format/date.js";
 import { formatTxt } from "./format/txt.js";
 import type { Level } from "./types";
 
-// Check environment for output format
-const isProduction = process?.env?.NODE_ENV === "production" || process?.env?.NODE_ENV === "prod";
-
 function msg(lvl: Level, txt: string, ctx: Record<string, string | number | string[] | number[]>): string {
   
   const ts = formatDate();
   const misc = formatMisc(ctx);
+  
+  // Check environment for output format (dynamic check)
+  const isProduction = process?.env?.NODE_ENV === "production" || process?.env?.NODE_ENV === "prod";
   
   // Production format: pure logfmt (single line with escaped newlines)
   if (isProduction) {

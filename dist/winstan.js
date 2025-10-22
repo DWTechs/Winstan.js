@@ -26,8 +26,8 @@ https://github.com/DWTechs/Winstan.js
 
 import { isProperty, isString, isNumber, isArray, isObject, isAnsiEscapeCode, isLocale, isTimeZone, isStringOfLength } from '@dwtechs/checkard';
 
-var _a$5;
-const { NODE_ENV } = (_a$5 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$5 !== void 0 ? _a$5 : null;
+var _a$4;
+const { NODE_ENV } = (_a$4 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$4 !== void 0 ? _a$4 : null;
 const dev = "debug";
 const prod = "info";
 const levels = {
@@ -80,8 +80,8 @@ function setColors(newColors) {
     }
 }
 
-var _a$4;
-const { COLORIZE } = (_a$4 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$4 !== void 0 ? _a$4 : null;
+var _a$3;
+const { COLORIZE } = (_a$3 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$3 !== void 0 ? _a$3 : null;
 let colorize = COLORIZE !== "false" && COLORIZE !== "0";
 const reset = '\x1b[0m';
 function formatColor(level, text) {
@@ -90,8 +90,8 @@ function formatColor(level, text) {
     return `${getColor(level)}${text}${reset}`;
 }
 
-var _a$3;
-const { LOCALE } = (_a$3 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$3 !== void 0 ? _a$3 : null;
+var _a$2;
+const { LOCALE } = (_a$2 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$2 !== void 0 ? _a$2 : null;
 const def = 'fr-FR';
 let locale = isLocale(LOCALE) ? LOCALE : def;
 function setLocale(loc) {
@@ -100,8 +100,8 @@ function setLocale(loc) {
     return locale;
 }
 
-var _a$2;
-const { TZ } = (_a$2 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$2 !== void 0 ? _a$2 : null;
+var _a$1;
+const { TZ } = (_a$1 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$1 !== void 0 ? _a$1 : null;
 const dTimeZone = 'Europe/Paris';
 let timeZone = isTimeZone(TZ) ? TZ : dTimeZone;
 function setTimeZone(tz) {
@@ -141,11 +141,11 @@ function formatTxt(value) {
     return String(value);
 }
 
-var _a$1, _b;
-const isProduction = ((_a$1 = process === null || process === void 0 ? void 0 : process.env) === null || _a$1 === void 0 ? void 0 : _a$1.NODE_ENV) === "production" || ((_b = process === null || process === void 0 ? void 0 : process.env) === null || _b === void 0 ? void 0 : _b.NODE_ENV) === "prod";
 function msg(lvl, txt, ctx) {
+    var _a, _b;
     const ts = formatDate();
     const misc = formatMisc(ctx);
+    const isProduction = ((_a = process === null || process === void 0 ? void 0 : process.env) === null || _a === void 0 ? void 0 : _a.NODE_ENV) === "production" || ((_b = process === null || process === void 0 ? void 0 : process.env) === null || _b === void 0 ? void 0 : _b.NODE_ENV) === "prod";
     if (isProduction) {
         let logfmtLine = `time=${ts} level=${lvl}`;
         if (misc)
