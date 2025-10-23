@@ -1,9 +1,19 @@
-# 0.5.0 (Oct 09th 2025)
+# 0.5.0 (Oct 20th 2025)
 
-- Improve log formatting with multi-line capability
-- Update dependencies: 
-    - @dwtechs/checkard: 3.5.1
-    - winston: 3.18.3
+- **BREAKING**: No longer uses Winston as a dependency - complete rewrite for better performance
+- **NEW**: Environment-based log formatting:
+  - Development mode (default): Human-readable multiline logs with indentation
+  - Production mode (`NODE_ENV=production|prod`): Pure logfmt format with escaped newlines
+- **IMPROVED**: Enhanced multiline message handling:
+  - Development: Indented continuation lines for better readability
+  - Production: Escaped newlines within single logfmt entries
+- Update @dwtechs/checkard dependency to 3.6.0
+- New initialization functions:
+  - `setLevel()`
+  - `setColors()`
+  - `setLocale()`
+  - `setTimeZone()`
+  - `setService()`
 
 
 # 0.4.0 (Mar 15th 2025)

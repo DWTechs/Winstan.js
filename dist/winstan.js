@@ -24,115 +24,195 @@ SOFTWARE.
 https://github.com/DWTechs/Winstan.js
 */
 
-import winston from 'winston';
-import { isString, isNumber, isArray, isStringOfLength, isProperty } from '@dwtechs/checkard';
+import { isProperty, isString, isNumber, isArray, isObject, isAnsiEscapeCode, isLocale, isTimeZone, isStringOfLength } from '@dwtechs/checkard';
 
-function normalizeInfo(info) {
-    let m = "";
-    for (const key in info) {
-        if (key === "message" || key === "level")
-            continue;
-        const v = info[key];
-        if (isString(v, "!0"))
-            m += `${key}="${v}" `;
-        if (isNumber(v, true, ">", 0))
-            m += `${key}=${v} `;
-        if (isArray(v, ">", 0))
-            m += `${key}="${v.toString()}" `;
-    }
-    return m;
-}
-
-let format;
-function setDateFormat(timeZone, locale) {
-    const tz = (isString(timeZone) && isStringOfLength(timeZone, 2, 999)) ? timeZone : "europe/paris";
-    const l = (isString(locale) && isStringOfLength(locale, 5, 5)) ? locale : "fr-FR";
-    return new Date().toLocaleString(l, { timeZone: tz });
-}
-function setService(service) {
-    return (isString(service) && isStringOfLength(service, 1, 99)) ? service : "";
-}
-function setTransports() {
-    return [new winston.transports.Console()];
-}
-function setFormat(dateFormat, service) {
-    const sn = service ? `service="${service}" ` : "";
-    format = winston.format.combine(winston.format.colorize({ all: true }), winston.format.timestamp({ format: dateFormat }), winston.format.align(), winston.format.printf((info) => {
-        var _a, _b;
-        const msg = (_b = (_a = info.message) === null || _a === void 0 ? void 0 : _a.toString()) !== null && _b !== void 0 ? _b : "";
-        const i = normalizeInfo(info);
-        if (msg.includes('\n')) {
-            const lines = msg.split('\n');
-            return lines
-                .map((line, idx) => idx === 0
-                ? `${info.level} | ${line.trim()} ${sn}${i}`.trim()
-                : `${' '.repeat(info.level.length)} | ${line.trim()}`)
-                .join('\n');
-        }
-        else {
-            const cleanMsg = msg.replace(/\s{2,}/g, " ").trim();
-            return `${info.level} | ${cleanMsg} ${sn}${i}`;
-        }
-    }));
-}
-function getFormat() {
-    return format;
-}
-
+var _a$4;
+const { NODE_ENV } = (_a$4 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$4 !== void 0 ? _a$4 : null;
+const dev = "debug";
+const prod = "info";
 const levels = {
     error: 0,
     warn: 1,
     info: 2,
     debug: 3,
 };
-let level = "debug";
-function getLevels() {
-    return levels;
-}
-function getLevel() {
-    return level;
-}
+let level = dev;
 function setLevel(lvl) {
     level = isProperty(levels, lvl) ? lvl : level;
     return level;
 }
-
-var _a;
-let logger;
-function init(timeZone, locale, service, level) {
-    const dateFormat = setDateFormat(timeZone, locale);
-    const s = setService(service);
-    setLevel(level);
-    setFormat(dateFormat, s);
-    logger = winston.createLogger({
-        level: getLevel(),
-        silent: false,
-        format: getFormat(),
-        levels: getLevels(),
-        transports: setTransports()
-    });
+function shouldLog(lev) {
+    return levels[lev] <= levels[level];
 }
-const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = (_a = process === null || process === void 0 ? void 0 : process.env) !== null && _a !== void 0 ? _a : null;
-setLevel((NODE_ENV === "prod" || NODE_ENV === "production") ? "info" : "debug");
-init(TZ, LOCALE, SERVICE_NAME, getLevel());
-function print(lvl, msg, info) {
-    if (!isString(msg, "!0"))
+setLevel((NODE_ENV === "prod" || NODE_ENV === "production") ? prod : dev);
+
+function formatMisc(ctx) {
+    let m = "";
+    for (const key in ctx) {
+        if (key === "message" || key === "level")
+            continue;
+        const v = ctx[key];
+        if (isString(v, "!0") || isNumber(v, false))
+            m += `${key}="${v}" - `;
+        else if (isArray(v, ">", 0))
+            m += `${key}=["${v.toString()}]" - `;
+    }
+    return m;
+}
+
+const colors = {
+    error: '\x1b[31m',
+    warn: '\x1b[33m',
+    info: '\x1b[34m',
+    debug: '\x1b[32m',
+};
+function getColor(level) {
+    return colors[level] || '';
+}
+function setColors(newColors) {
+    if (!isObject(newColors) && newColors !== null)
         return;
-    logger[lvl](msg, info);
+    for (const key in newColors) {
+        const l = key;
+        const v = newColors[l];
+        if (isProperty(colors, l) && isAnsiEscapeCode(v))
+            colors[l] = v;
+    }
+}
+
+var _a$3;
+const { COLORIZE } = (_a$3 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$3 !== void 0 ? _a$3 : null;
+let colorize = COLORIZE !== "false" && COLORIZE !== "0";
+const reset = '\x1b[0m';
+function formatColor(level, text) {
+    if (!colorize)
+        return text;
+    return `${getColor(level)}${text}${reset}`;
+}
+
+var _a$2;
+const { LOCALE } = (_a$2 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$2 !== void 0 ? _a$2 : null;
+const def = 'fr-FR';
+let locale = isLocale(LOCALE) ? LOCALE : def;
+function setLocale(loc) {
+    if (isLocale(loc))
+        locale = loc;
+    return locale;
+}
+
+var _a$1;
+const { TZ } = (_a$1 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$1 !== void 0 ? _a$1 : null;
+const dTimeZone = 'Europe/Paris';
+let timeZone = isTimeZone(TZ) ? TZ : dTimeZone;
+function setTimeZone(tz) {
+    if (isTimeZone(tz))
+        timeZone = tz;
+    return timeZone;
+}
+
+function formatDate() {
+    const now = new Date();
+    const date = now.toLocaleDateString(locale, { timeZone });
+    const time = now.toLocaleTimeString(locale, { timeZone });
+    const ms = now.getMilliseconds().toString().padStart(3, '0');
+    return `${date} ${time}:${ms}`;
+}
+
+function formatTxt(value) {
+    if (isString(value)) {
+        const escaped = value
+            .replace(/\\/g, '\\\\')
+            .replace(/"/g, '\\"')
+            .replace(/\n/g, '\\n')
+            .replace(/\r/g, '\\r')
+            .replace(/\t/g, '\\t');
+        if (/[\s"'=\\]/.test(escaped)) {
+            return `"${escaped}"`;
+        }
+        return escaped;
+    }
+    else if (isNumber(value)) {
+        return value.toString();
+    }
+    else if (isArray(value)) {
+        const items = value.map(item => isString(item) ? `"${item.toString().replace(/"/g, '\\"')}"` : item.toString());
+        return `"[${items.join(',')}]"`;
+    }
+    return String(value);
+}
+
+function msg(lvl, txt, ctx) {
+    var _a, _b;
+    const ts = formatDate();
+    const misc = formatMisc(ctx);
+    const isProduction = ((_a = process === null || process === void 0 ? void 0 : process.env) === null || _a === void 0 ? void 0 : _a.NODE_ENV) === "production" || ((_b = process === null || process === void 0 ? void 0 : process.env) === null || _b === void 0 ? void 0 : _b.NODE_ENV) === "prod";
+    if (isProduction) {
+        let logfmtLine = `time=${ts} level=${lvl}`;
+        if (misc)
+            logfmtLine += ` ${misc}`;
+        const formattedTxt = formatTxt(txt);
+        logfmtLine += ` msg=${formattedTxt}`;
+        return formatColor(lvl, logfmtLine);
+    }
+    const lines = (txt === null || txt === void 0 ? void 0 : txt.toString().split(/[\n\r]+/)) || [];
+    if (lines.length > 1) {
+        let result = '';
+        lines.forEach((line, i) => {
+            const trimmedLine = line.replace(/\s{2,}/g, " ").trim();
+            if (i === 0) {
+                let firstLine = `time=${ts} level=${lvl}`;
+                if (misc)
+                    firstLine += ` ${misc}`;
+                firstLine += ` msg=${formatTxt(trimmedLine)}`;
+                result += formatColor(lvl, firstLine);
+            }
+            else {
+                result += '\n' + formatColor(lvl, `  ${trimmedLine}`);
+            }
+        });
+        return result;
+    }
+    let logfmtLine = `time=${ts} level=${lvl}`;
+    const formattedTxt = formatTxt(txt);
+    logfmtLine += ` msg=${formattedTxt}`;
+    if (misc)
+        logfmtLine += ` ${misc}`;
+    return formatColor(lvl, logfmtLine);
+}
+function print(lvl, txt, ctx) {
+    if (!shouldLog(lvl))
+        return;
+    if (!isString(txt, "!0"))
+        return;
+    const m = msg(lvl, txt, ctx || {});
+    if (lvl === 'error')
+        console.error(m);
+    else if (lvl === 'warn')
+        console.warn(m);
+    else
+        console.log(m);
 }
 const log = {
-    error: (msg, info) => {
-        print('error', msg, info);
+    error: (txt, ctx) => {
+        print('error', txt, ctx);
     },
-    warn: (msg, info) => {
-        print('warn', msg, info);
+    warn: (txt, ctx) => {
+        print('warn', txt, ctx);
     },
-    info: (msg, info) => {
-        print('info', msg, info);
+    info: (txt, ctx) => {
+        print('info', txt, ctx);
     },
-    debug: (msg, info) => {
-        print('debug', msg, info);
+    debug: (txt, ctx) => {
+        print('debug', txt, ctx);
     }
 };
 
-export { init, log };
+var _a;
+const { SERVICE_NAME } = (_a = process === null || process === void 0 ? void 0 : process.env) !== null && _a !== void 0 ? _a : null;
+let service = isStringOfLength(SERVICE_NAME, 1, 99) ? SERVICE_NAME : "";
+function setService(srv) {
+    service = isStringOfLength(service, 1, 99) ? srv : service;
+    return service;
+}
+
+export { log, setColors, setLevel, setLocale, setService, setTimeZone };
