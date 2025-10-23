@@ -45,19 +45,105 @@ $ npm i @dwtechs/winstan
 
 ### ES6 / TypeScript
 
+#### Basic Usage
+
 ```javascript
 import { log } from "@dwtechs/winstan";
 
+// Simple error logging
 log.error(`App cannot start: ${err.msg}`);
+
+// Info with basic context
 log.info(
   `App started on port : ${PORT}`, 
   { user: "System" }
 );
+
+// Debug with multiple context values
 log.debug(
   `Update one(user=${JSON.stringify(users)})`, 
   { user: "admin", tags: ["user", "update"] }
 );
+```
 
+#### Advanced Examples with Context Values
+
+```javascript
+import { log } from "@dwtechs/winstan";
+
+// Authentication logging with user context
+log.info("User login successful", {
+  userId: "12345",
+  email: "user@example.com",
+  loginMethod: "password",
+  ipAddress: "192.168.1.100",
+  tags: ["auth", "login"]
+});
+
+// Database operation logging
+log.debug("Database query executed", {
+  operation: "SELECT",
+  table: "users",
+  executionTime: 45,
+  rowsReturned: 150,
+  queryId: "q_789",
+  tags: ["database", "performance"]
+});
+
+// API request logging
+log.info("API request processed", {
+  method: "POST",
+  endpoint: "/api/users",
+  statusCode: 201,
+  responseTime: 125,
+  requestId: "req_abc123",
+  clientId: "client_456",
+  tags: ["api", "request"]
+});
+
+// Error logging with detailed context
+log.error("Payment processing failed", {
+  orderId: "order_789",
+  userId: "user_456",
+  amount: 99.99,
+  currency: "EUR",
+  paymentMethod: "credit_card",
+  errorCode: "INSUFFICIENT_FUNDS",
+  transactionId: "tx_def456",
+  tags: ["payment", "error", "transaction"]
+});
+
+// Warning with system metrics
+log.warn("High memory usage detected", {
+  memoryUsage: 85.7,
+  threshold: 80,
+  processId: 1234,
+  service: "api-server",
+  alertLevel: "medium",
+  tags: ["system", "memory", "alert"]
+});
+
+// Business logic logging
+log.debug("Order processing workflow", {
+  orderId: "order_123",
+  step: "inventory_check",
+  stepNumber: 3,
+  totalSteps: 8,
+  processingTime: 234,
+  workflowId: "wf_789",
+  tags: ["workflow", "order", "inventory"]
+});
+
+// Multi-service communication
+log.info("External service called", {
+  serviceName: "payment-gateway",
+  endpoint: "https://api.payment.com/charge",
+  method: "POST",
+  responseCode: 200,
+  responseTime: 1250,
+  correlationId: "corr_xyz789",
+  tags: ["external", "payment", "integration"]
+});
 ```
 
 
@@ -131,12 +217,38 @@ log.info(`App started on port : ${PORT}`);
 
 ```
 
-### Production mode
---- 
+### Log Formatting Modes
+---
 
-Possible values for **NODE_ENV** environment variable are "production" and "prod".
-Those values will set Winstan log level to **info**.
-Any other value (like "dev" or "development") will set the log level to **debug**
+Winstan automatically adapts its log formatting based on the environment:
+
+#### Development Mode (Default)
+- **When**: Any `NODE_ENV` value except "production" or "prod"
+- **Format**: Human-readable multiline logs with proper indentation
+- **Log Level**: `debug` (shows all log levels)
+- **Multiline Handling**: Indented continuation lines for better readability
+
+**Example output:**
+```
+debug | Multi-line message
+      | continues here with proper indentation
+      | for better readability
+```
+
+#### Production Mode
+- **When**: `NODE_ENV=production` or `NODE_ENV=prod`
+- **Format**: Pure logfmt format with escaped newlines (single-line entries)
+- **Log Level**: `info` (hides debug logs for performance)
+- **Multiline Handling**: Escaped newlines within single logfmt entries
+
+**Example output:**
+```
+level=info msg="Multi-line message\ncontinues here\nall on one line" service="my-app"
+```
+
+This dual formatting approach ensures:
+- **Development**: Maximum readability for debugging
+- **Production**: Structured logging compatible with log aggregators and monitoring tools
 
 
 ## API Reference

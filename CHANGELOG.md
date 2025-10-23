@@ -1,7 +1,7 @@
 # 0.5.0 (Oct 20th 2025)
 
-- **BREAKING**: No longer uses Winston as a dependency - complete rewrite for better performance
-- **NEW**: Environment-based log formatting:
+- No longer uses Winston as a dependency - complete rewrite for better performance
+- Environment-based log formatting:
   - Development mode (default): Human-readable multiline logs with indentation
   - Production mode (`NODE_ENV=production|prod`): Pure logfmt format with escaped newlines
 - **IMPROVED**: Enhanced multiline message handling:
