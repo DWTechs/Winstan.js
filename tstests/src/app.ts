@@ -1,4 +1,4 @@
-import { log } from "../../dist/winstan.js";
+import { log, setService } from "../../dist/winstan.js";
 
 function runTests(mode: string) {
   console.log(`\n🧪 === TESTING ${mode.toUpperCase()} MODE ===`);
@@ -70,34 +70,31 @@ runTests('default (undefined)');
 // ========================================
 
 function testServiceName() {
-  console.log("\n🏷️ === TESTING SERVICE_NAME ENVIRONMENT VARIABLE ===");
+  console.log("\n🏷️ === TESTING SERVICE CONFIGURATION ===");
+  console.log("NOTE: SERVICE_NAME should be set at startup via environment variable");
+  console.log("or programmatically via setService() method, not changed during runtime.");
   
-  // Test 1: No SERVICE_NAME set (should show no service in logs)
-  delete process.env.SERVICE_NAME;
-  console.log("\n--- Test 1: No SERVICE_NAME set ---");
-  console.log(`SERVICE_NAME: ${process.env.SERVICE_NAME || 'undefined'}`);
+  // Test 1: No service set (should show no service in logs)
+  console.log("\n--- Test 1: No service configured ---");
   log.info("Test message without service name");
   log.error("Error message without service name", { userId: 123 });
   
-  // Test 2: SERVICE_NAME set to simple service name
-  process.env.SERVICE_NAME = "user-service";
-  console.log("\n--- Test 2: SERVICE_NAME = 'user-service' ---");
-  console.log(`SERVICE_NAME: ${process.env.SERVICE_NAME}`);
+  // Test 2: Service name set via setService() method
+  console.log("\n--- Test 2: Service set via setService('user-service') ---");
+  setService("user-service");
   log.info("Test message with user-service");
   log.warn("Warning message with user-service", { requestId: 456 });
   log.error("Error message with user-service", { userId: 123, error: "Connection failed" });
   
-  // Test 3: SERVICE_NAME with special characters
-  process.env.SERVICE_NAME = "ms_auth-api";
-  console.log("\n--- Test 3: SERVICE_NAME = 'ms_auth-api' ---");
-  console.log(`SERVICE_NAME: ${process.env.SERVICE_NAME}`);
+  // Test 3: Service with special characters
+  console.log("\n--- Test 3: setService('ms_auth-api') ---");
+  setService("ms_auth-api");
   log.info("Authentication service started");
   log.debug("Token validation completed", { tokenId: "abc123", userId: 789 });
   
-  // Test 4: SERVICE_NAME with spaces and special chars
-  process.env.SERVICE_NAME = "My App Service v2.1";
-  console.log("\n--- Test 4: SERVICE_NAME = 'My App Service v2.1' ---");
-  console.log(`SERVICE_NAME: ${process.env.SERVICE_NAME}`);
+  // Test 4: Service with spaces and special chars
+  console.log("\n--- Test 4: setService('My App Service v2.1') ---");
+  setService("My App Service v2.1");
   log.info("Application service with version info");
   log.error("Service error with complex name", { version: "2.1", module: "auth" });
   

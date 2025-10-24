@@ -115,7 +115,7 @@ function formatDate() {
     const date = now.toLocaleDateString(locale, { timeZone });
     const time = now.toLocaleTimeString(locale, { timeZone });
     const ms = now.getMilliseconds().toString().padStart(3, '0');
-    return `${date} ${time}:${ms}`;
+    return `time=${date} ${time}:${ms}`;
 }
 
 function formatTxt(value) {
@@ -141,13 +141,35 @@ function formatTxt(value) {
     return String(value);
 }
 
+var _a;
+const { SERVICE_NAME } = (_a = process === null || process === void 0 ? void 0 : process.env) !== null && _a !== void 0 ? _a : null;
+let service = "";
+function setService(srv) {
+    if (isStringOfLength(srv, 1, 99))
+        service = srv;
+    return service;
+}
+function getService() {
+    return service;
+}
+setService(SERVICE_NAME);
+
+function formatService() {
+    const service = getService();
+    return service ? `service=${formatTxt(service)}` : "";
+}
+
 function msg(lvl, txt, ctx) {
     var _a, _b;
     const ts = formatDate();
     const misc = formatMisc(ctx);
+    const service = formatService();
+    const l = `level=${lvl}`;
     const isProduction = ((_a = process === null || process === void 0 ? void 0 : process.env) === null || _a === void 0 ? void 0 : _a.NODE_ENV) === "production" || ((_b = process === null || process === void 0 ? void 0 : process.env) === null || _b === void 0 ? void 0 : _b.NODE_ENV) === "prod";
     if (isProduction) {
-        let logfmtLine = `time=${ts} level=${lvl}`;
+        let logfmtLine = `${ts} ${l}`;
+        if (service)
+            logfmtLine += ` ${service}`;
         if (misc)
             logfmtLine += ` ${misc}`;
         const formattedTxt = formatTxt(txt);
@@ -160,7 +182,9 @@ function msg(lvl, txt, ctx) {
         lines.forEach((line, i) => {
             const trimmedLine = line.replace(/\s{2,}/g, " ").trim();
             if (i === 0) {
-                let firstLine = `time=${ts} level=${lvl}`;
+                let firstLine = `${ts} ${l}`;
+                if (service)
+                    firstLine += ` ${service}`;
                 if (misc)
                     firstLine += ` ${misc}`;
                 firstLine += ` msg=${formatTxt(trimmedLine)}`;
@@ -172,11 +196,13 @@ function msg(lvl, txt, ctx) {
         });
         return result;
     }
-    let logfmtLine = `time=${ts} level=${lvl}`;
-    const formattedTxt = formatTxt(txt);
-    logfmtLine += ` msg=${formattedTxt}`;
+    let logfmtLine = `${ts} ${l}`;
+    if (service)
+        logfmtLine += ` ${service}`;
     if (misc)
         logfmtLine += ` ${misc}`;
+    const formattedTxt = formatTxt(txt);
+    logfmtLine += ` msg=${formattedTxt}`;
     return formatColor(lvl, logfmtLine);
 }
 function print(lvl, txt, ctx) {
@@ -206,13 +232,5 @@ const log = {
         print('debug', txt, ctx);
     }
 };
-
-var _a;
-const { SERVICE_NAME } = (_a = process === null || process === void 0 ? void 0 : process.env) !== null && _a !== void 0 ? _a : null;
-let service = isStringOfLength(SERVICE_NAME, 1, 99) ? SERVICE_NAME : "";
-function setService(srv) {
-    service = isStringOfLength(service, 1, 99) ? srv : service;
-    return service;
-}
 
 export { log, setColors, setLevel, setLocale, setService, setTimeZone };

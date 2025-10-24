@@ -4,19 +4,26 @@ import { formatMisc } from "./format/misc.js";
 import { formatColor } from "./format/color.js";
 import { formatDate } from "./format/date.js";
 import { formatTxt } from "./format/txt.js";
+import { formatService } from "./format/service.js";
 import type { Level } from "./types";
 
 function msg(lvl: Level, txt: string, ctx: Record<string, string | number | string[] | number[]>): string {
   
   const ts = formatDate();
   const misc = formatMisc(ctx);
+  const service = formatService();
+  const l = `level=${lvl}`;
   
   // Check environment for output format (dynamic check)
   const isProduction = process?.env?.NODE_ENV === "production" || process?.env?.NODE_ENV === "prod";
   
   // Production format: pure logfmt (single line with escaped newlines)
   if (isProduction) {
-    let logfmtLine = `time=${ts} level=${lvl}`;
+    let logfmtLine = `${ts} ${l}`;
+    
+    // Add service name if configured
+    if (service)
+      logfmtLine += ` ${service}`;
     
     // Add context fields using formatMisc
     if (misc)
@@ -37,7 +44,11 @@ function msg(lvl: Level, txt: string, ctx: Record<string, string | number | stri
       const trimmedLine = line.replace(/\s{2,}/g, " ").trim();
       if (i === 0) {
         // First line uses the full context
-        let firstLine = `time=${ts} level=${lvl}`;
+        let firstLine = `${ts} ${l}`;
+        
+        if (service)
+          firstLine += ` ${service}`;
+        
         if (misc)
           firstLine += ` ${misc}`;
         firstLine += ` msg=${formatTxt(trimmedLine)}`;
@@ -51,15 +62,18 @@ function msg(lvl: Level, txt: string, ctx: Record<string, string | number | stri
   }
   
   // Single line in development mode
-  let logfmtLine = `time=${ts} level=${lvl}`;
+  let logfmtLine = `${ts} ${l}`;
+  
+  if (service)
+    logfmtLine += ` ${service}`;
+  
+  // Add context fields using formatMisc
+  if (misc)
+    logfmtLine += ` ${misc}`;
   
   // Add message (no escaping in development for readability)
   const formattedTxt = formatTxt(txt);
   logfmtLine += ` msg=${formattedTxt}`;
-
-  // Add context fields using formatMisc
-  if (misc)
-    logfmtLine += ` ${misc}`;
   
   return formatColor(lvl, logfmtLine);
 }

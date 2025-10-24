@@ -7,7 +7,7 @@ function formatDate(): string {
   const date = now.toLocaleDateString(locale, { timeZone });
   const time = now.toLocaleTimeString(locale, { timeZone });
   const ms = now.getMilliseconds().toString().padStart(3, '0');
-  return `${date} ${time}:${ms}`;
+  return `time=${date} ${time}:${ms}`;
 }
 
 export { formatDate };
