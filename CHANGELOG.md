@@ -7,7 +7,7 @@
 - **IMPROVED**: Enhanced multiline message handling:
   - Development: Indented continuation lines for better readability
   - Production: Escaped newlines within single logfmt entries
-- New initialization functions:
+- **NEW**: Added initialization functions:
   - `setLevel()`
   - `setColors()`
   - `setColorize()`

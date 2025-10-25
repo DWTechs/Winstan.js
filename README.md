@@ -164,13 +164,8 @@ Winstan will start with the following default configuration :
   let timeZone = "europe/paris";
   let level = "debug";
   let serviceName = "";
+  let colorize = true; // false in production mode
 ```
-- **level** is the log level to display.  
-- **locale** is the locale configuration to set date and time to your region.  
-- **timeZone** is the timezone configuration to set time to your region.  
-- **serviceName** is the service name. (Or the application name)  
-If provided, it will appear in every log.  
-It is useful in a multi-service or multi-application monitoring tool.
 
 You can configure Winstan using 2 methods :
 
@@ -208,19 +203,56 @@ This provides optimal defaults while allowing manual override when needed.
 These environment variables will update the default values of the lib at start up.
 So you do not need to init the library in the code.
 
-### init() method
+### Runtime Configuration Methods
 ---
 
-This method will override ENV variables.
+Winstan provides several methods to configure settings at runtime, which will override both default values and environment variables:
 
 ```javascript
+import { 
+  log, 
+  setLevel, 
+  setColors, 
+  setColorize,
+  setLocale, 
+  setTimeZone, 
+  setService 
+} from "@dwtechs/winstan";
 
-import { log, init } from "@dwtechs/winstan";
+// Configure log level
+setLevel("info");  // Only show info, warn, and error messages
 
-init( "UTC", "fr-FR", "ms_user", "debug" );
-log.info(`App started on port : ${PORT}`);
+// Configure custom colors for different log levels
+setColors({
+  error: '\x1b[91m',  // Bright red
+  warn: '\x1b[93m',   // Bright yellow
+  info: '\x1b[96m',   // Bright cyan
+  debug: '\x1b[95m'   // Bright magenta
+});
 
+// Enable/disable colorization
+setColorize(false);  // Disable colors for file output
+setColorize(true);   // Enable colors for terminal output
+
+// Configure locale for timestamp formatting
+setLocale("en-US");  // US English date format
+
+// Configure timezone for timestamps
+setTimeZone("UTC");  // Use UTC timezone
+
+// Set service name for all logs
+setService("user-api");  // Will appear as service=user-api in logs
+
+// Start logging with custom configuration
+log.info("Application started with custom settings");
 ```
+
+**Key Features:**
+- **Runtime Override**: These methods override environment variables and defaults
+- **Immediate Effect**: Changes apply to all subsequent log calls
+- **Return Values**: All methods return the current value for confirmation
+- **Validation**: Invalid inputs are ignored, current settings remain unchanged
+- **Flexible Timing**: Can be called at any time during application lifecycle
 
 ### Log Formatting Modes
 ---
