@@ -7,7 +7,6 @@
 - [Support](#support)
 - [Installation](#installation)
 - [Usage](#usage)
-  - [ES6](#es6)
 - [Configure](#configure)
 - [API Reference](#api-reference)
 - [Contributors](#contributors)
@@ -196,7 +195,7 @@ If it is set to any other value, the log level will be set to **debug**.
 
 - **TZ** is the timezone configuration to set time to your region.  
 
-- **SERVICE_NAME** is the service name. (Or the application name)  
+- **SERVICE_NAME** is the name of the service. (Or the application name)  
 If provided, it will appear in every log.  
 It is useful in a multi-service or multi-application monitoring tool.  
 
@@ -323,8 +322,8 @@ const log: {
    * log.error('Authentication failed', { userId: 123, reason: 'invalid_token' });
    */
   error: (
-    msg: string, 
-    info?: Record<string, string | number | string[] | number[]>
+    txt: string, 
+    ctx?: Record<string, string | number | string[] | number[]>
   ): void => {},
   /**
    * Logs warning messages for conditions that should be noted but don't require immediate action.
@@ -338,8 +337,8 @@ const log: {
    * log.warn('Deprecated function used', { function: 'oldMethod', caller: 'userService' });
    */
   warn: (
-    msg: string,
-    info?: Record<string, string | number | string[] | number[]>
+    txt: string,
+    ctx?: Record<string, string | number | string[] | number[]>
   ): void => {},
   /**
    * Logs informational messages for general application events.
@@ -353,8 +352,8 @@ const log: {
    * log.info('User action completed', { action: 'purchase', userId: 456, amount: 29.99 });
    */
   info: (
-    msg: string,
-    info?: Record<string, string | number | string[] | number[]>
+    txt: string,
+    ctx?: Record<string, string | number | string[] | number[]>
   ): void => {},
   /**
    * Logs debug messages for detailed information useful during development and troubleshooting.
@@ -369,8 +368,8 @@ const log: {
    * log.debug('SQL query executed', { query: 'SELECT * FROM users', duration: '15ms' });
    */
   debug: (
-    msg: string,
-    info?: Record<string, string | number | string[] | number[]>
+    txt: string,
+    ctx?: Record<string, string | number | string[] | number[]>
   ): void => {},
 };
 
