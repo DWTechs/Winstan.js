@@ -16,7 +16,7 @@
 
 ## Synopsis
 
-**[Winstan.js](https://github.com/DWTechs/Winstan.js)** is an open source log library for easy and lightweight logging.
+**[Winstan.js](https://github.com/DWTechs/Winstan.js)** is an open source log library for Node.js for easy and lightweight logging.
 
 - Only 1 small dependency to check inputs variables
 - Very lightweight

@@ -1,7 +1,7 @@
 {
   "name": "@dwtechs/winstan",
   "version": "0.5.0",
-  "description": "Open source log library for easy and lightweight logging.",
+  "description": "Open source log library for Node.js for easy and lightweight logging.",
   "keywords": [
     "logs", "logger"
   ],
