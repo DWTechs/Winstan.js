@@ -99,7 +99,7 @@ function testServiceName() {
   log.error("Service error with complex name", { version: "2.1", module: "auth" });
   
   // Test 5: Empty SERVICE_NAME
-  process.env.SERVICE_NAME = "";
+  setService("");
   console.log("\n--- Test 5: SERVICE_NAME = '' (empty string) ---");
   console.log(`SERVICE_NAME: '${process.env.SERVICE_NAME}'`);
   log.info("Test message with empty service name");
@@ -107,7 +107,7 @@ function testServiceName() {
   
   // Test 6: SERVICE_NAME in different environments
   console.log("\n--- Test 6: SERVICE_NAME in Production Mode ---");
-  process.env.SERVICE_NAME = "prod-api";
+  setService("prod-api");
   process.env.NODE_ENV = "production";
   console.log(`SERVICE_NAME: ${process.env.SERVICE_NAME}`);
   console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -115,7 +115,7 @@ function testServiceName() {
   log.error("Production error with service name", { errorCode: 500 });
   
   console.log("\n--- Test 7: SERVICE_NAME in Development Mode ---");
-  process.env.SERVICE_NAME = "dev-api";
+  setService("dev-api");
   process.env.NODE_ENV = "development";
   console.log(`SERVICE_NAME: ${process.env.SERVICE_NAME}`);
   console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
@@ -124,7 +124,7 @@ function testServiceName() {
   
   // Test 8: Multiline messages with SERVICE_NAME
   console.log("\n--- Test 8: Multiline Messages with SERVICE_NAME ---");
-  process.env.SERVICE_NAME = "complex-service";
+  setService("complex-service");
   process.env.NODE_ENV = "development";
   log.info(`Service initialization:
 - Database connected

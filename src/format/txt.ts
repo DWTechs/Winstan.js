@@ -27,7 +27,7 @@ function formatTxt(value: string | number | string[] | number[]): string {
     const items = (value as (string | number)[]).map(item => 
       isString(item) ? `"${item.toString().replace(/"/g, '\\"')}"` : item.toString()
     );
-    return `"[${items.join(',')}]"`;
+    return `[${items.join(',')}]`;
   }
   return String(value);
 }

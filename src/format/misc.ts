@@ -3,6 +3,7 @@ import {
   isString,
   isArray
 } from "@dwtechs/checkard";
+import { formatTxt } from "./txt.js";
 
 
 function formatMisc(ctx: Record<string, string | number | string[] | number[]>): string {
@@ -11,12 +12,10 @@ function formatMisc(ctx: Record<string, string | number | string[] | number[]>):
     if (key === "message" || key === "level")
       continue;
     const v = ctx[key];
-    if (isString(v, "!0") || isNumber(v, false))
-      m += `${key}="${v}" - `;
-    else if (isArray(v, ">", 0))
-      m += `${key}=["${v.toString()}]" - `;
+    if (isString(v, "!0") || isNumber(v, false) || isArray(v, ">", 0))
+      m += `${key}=${formatTxt(v)} `;
   }
-  return m;
+  return m.trim();
 }
 
 export {

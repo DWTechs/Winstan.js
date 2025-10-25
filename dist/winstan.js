@@ -46,18 +46,39 @@ function shouldLog(lev) {
 }
 setLevel((NODE_ENV === "prod" || NODE_ENV === "production") ? prod : dev);
 
+function formatTxt(value) {
+    if (isString(value)) {
+        const escaped = value
+            .replace(/\\/g, '\\\\')
+            .replace(/"/g, '\\"')
+            .replace(/\n/g, '\\n')
+            .replace(/\r/g, '\\r')
+            .replace(/\t/g, '\\t');
+        if (/[\s"'=\\]/.test(escaped)) {
+            return `"${escaped}"`;
+        }
+        return escaped;
+    }
+    else if (isNumber(value)) {
+        return value.toString();
+    }
+    else if (isArray(value)) {
+        const items = value.map(item => isString(item) ? `"${item.toString().replace(/"/g, '\\"')}"` : item.toString());
+        return `[${items.join(',')}]`;
+    }
+    return String(value);
+}
+
 function formatMisc(ctx) {
     let m = "";
     for (const key in ctx) {
         if (key === "message" || key === "level")
             continue;
         const v = ctx[key];
-        if (isString(v, "!0") || isNumber(v, false))
-            m += `${key}="${v}" - `;
-        else if (isArray(v, ">", 0))
-            m += `${key}=["${v.toString()}]" - `;
+        if (isString(v, "!0") || isNumber(v, false) || isArray(v, ">", 0))
+            m += `${key}=${formatTxt(v)} `;
     }
-    return m;
+    return m.trim();
 }
 
 const colors = {
@@ -116,29 +137,6 @@ function formatDate() {
     const time = now.toLocaleTimeString(locale, { timeZone });
     const ms = now.getMilliseconds().toString().padStart(3, '0');
     return `time=${date} ${time}:${ms}`;
-}
-
-function formatTxt(value) {
-    if (isString(value)) {
-        const escaped = value
-            .replace(/\\/g, '\\\\')
-            .replace(/"/g, '\\"')
-            .replace(/\n/g, '\\n')
-            .replace(/\r/g, '\\r')
-            .replace(/\t/g, '\\t');
-        if (/[\s"'=\\]/.test(escaped)) {
-            return `"${escaped}"`;
-        }
-        return escaped;
-    }
-    else if (isNumber(value)) {
-        return value.toString();
-    }
-    else if (isArray(value)) {
-        const items = value.map(item => isString(item) ? `"${item.toString().replace(/"/g, '\\"')}"` : item.toString());
-        return `"[${items.join(',')}]"`;
-    }
-    return String(value);
 }
 
 var _a;
