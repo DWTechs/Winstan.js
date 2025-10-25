@@ -111,25 +111,125 @@ function print(
 
 }
 
+/**
+ * Main logging interface providing structured logging with logfmt output format.
+ * Supports four log levels with environment-based formatting and contextual information.
+ * 
+ * @namespace log
+ * 
+ * @description
+ * The log object provides methods for different severity levels:
+ * - error: Critical errors that need immediate attention
+ * - warn: Warning conditions that should be noted
+ * - info: General information messages  
+ * - debug: Detailed information for debugging
+ * 
+ * Features:
+ * - Environment-based formatting (development: multiline, production: escaped)
+ * - Automatic timestamp inclusion with configurable timezone
+ * - Service name integration when configured
+ * - Context fields for structured logging
+ * - Level-based filtering and colored output
+ * - Logfmt compliance for log aggregation systems
+ * 
+ * @example
+ * // Basic logging
+ * log.info('Application started');
+ * log.error('Database connection failed');
+ * log.warn('Memory usage high');
+ * log.debug('Processing user request');
+ * 
+ * @example
+ * // Logging with context
+ * log.info('User logged in', { 
+ *   userId: 12345, 
+ *   email: 'user@example.com',
+ *   ip: '192.168.1.100'
+ * });
+ * 
+ * @example
+ * // Error logging with stack trace context
+ * log.error('Payment processing failed', {
+ *   orderId: 'ORD-123',
+ *   amount: 99.99,
+ *   errorCode: 'CARD_DECLINED'
+ * });
+ * 
+ * @example
+ * // Development output (multiline for readability):
+ * // 2023-12-25T10:30:45.123+01:00 level=info service=user-api userId=12345 msg="User logged in"
+ * 
+ * @example
+ * // Production output (escaped newlines):
+ * // 2023-12-25T09:30:45.123Z level=info service=user-api userId=12345 msg="User logged in"
+ */
 const log = {
+  /**
+   * Logs error messages for critical issues requiring immediate attention.
+   * Uses console.error() for output and appears in red when colors are enabled.
+   * 
+   * @param {string} txt - The error message to log
+   * @param {Record<string, string | number | string[] | number[]>} [ctx] - Optional context object with additional fields
+   * 
+   * @example
+   * log.error('Database connection timeout');
+   * log.error('Authentication failed', { userId: 123, reason: 'invalid_token' });
+   */
   error: (
     txt: string,
     ctx?: Record<string, string | number | string[] | number[]>,
   ) => {
     print('error', txt, ctx);
   },
+  
+  /**
+   * Logs warning messages for conditions that should be noted but don't require immediate action.
+   * Uses console.warn() for output and appears in yellow when colors are enabled.
+   * 
+   * @param {string} txt - The warning message to log
+   * @param {Record<string, string | number | string[] | number[]>} [ctx] - Optional context object with additional fields
+   * 
+   * @example
+   * log.warn('API rate limit approaching');
+   * log.warn('Deprecated function used', { function: 'oldMethod', caller: 'userService' });
+   */
   warn: (
     txt: string,
     ctx?: Record<string, string | number | string[] | number[]>,
   ) => {
     print('warn', txt, ctx);
   },
+  
+  /**
+   * Logs informational messages for general application events.
+   * Uses console.log() for output and appears in blue when colors are enabled.
+   * 
+   * @param {string} txt - The information message to log
+   * @param {Record<string, string | number | string[] | number[]>} [ctx] - Optional context object with additional fields
+   * 
+   * @example
+   * log.info('Server started on port 3000');
+   * log.info('User action completed', { action: 'purchase', userId: 456, amount: 29.99 });
+   */
   info: (
     txt: string,
     ctx?: Record<string, string | number | string[] | number[]>,
   ) => {
     print('info', txt, ctx);
   },
+  
+  /**
+   * Logs debug messages for detailed information useful during development and troubleshooting.
+   * Uses console.log() for output and appears in green when colors are enabled.
+   * Only shown when log level is set to 'debug'.
+   * 
+   * @param {string} txt - The debug message to log
+   * @param {Record<string, string | number | string[] | number[]>} [ctx] - Optional context object with additional fields
+   * 
+   * @example
+   * log.debug('Cache miss for key', { key: 'user:123', ttl: 300 });
+   * log.debug('SQL query executed', { query: 'SELECT * FROM users', duration: '15ms' });
+   */
   debug: (
     txt: string,
     ctx?: Record<string, string | number | string[] | number[]>,

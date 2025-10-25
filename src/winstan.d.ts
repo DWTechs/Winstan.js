@@ -1,10 +1,10 @@
 export type Level = 'error' | 'warn' | 'info' | 'debug';
 
 declare const log: {
-  error: (msg: string, info?: Record<string, string | number | string[] | number[]>) => void;
-  warn: (msg: string, info?: Record<string, string | number | string[] | number[]>) => void;
-  info: (msg: string, info?: Record<string, string | number | string[] | number[]>) => void;
-  debug: (msg: string, info?: Record<string, string | number | string[] | number[]>) => void;
+  error: (txt: string, ctx?: Record<string, string | number | string[] | number[]>) => void;
+  warn: (txt: string, ctx?: Record<string, string | number | string[] | number[]>) => void;
+  info: (txt: string, ctx?: Record<string, string | number | string[] | number[]>) => void;
+  debug: (txt: string, ctx?: Record<string, string | number | string[] | number[]>) => void;
 };
 
 declare function setColors(newColors: Partial<Record<Level, string>> | null): void;
