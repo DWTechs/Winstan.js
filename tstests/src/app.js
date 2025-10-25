@@ -1,4 +1,4 @@
-import { log, setService } from "../../dist/winstan.js";
+import { log, setService, setColorize } from "../../dist/winstan.js";
 function runTests(mode) {
     console.log(`\n🧪 === TESTING ${mode.toUpperCase()} MODE ===`);
     console.log(`NODE_ENV: ${process.env.NODE_ENV || 'undefined'}`);
@@ -103,4 +103,88 @@ function testServiceName() {
     console.log("\n🏷️ === SERVICE_NAME TESTS COMPLETED ===");
 }
 testServiceName();
+function testColorize() {
+    console.log("\n🎨 === TESTING COLORIZATION CONTROL ===");
+    console.log("NOTE: Color changes affect all subsequent log output");
+    console.log("\n--- Test 1: Default Colorization ---");
+    console.log(`NODE_ENV: ${process.env.NODE_ENV || 'undefined'}`);
+    console.log("Default colorization behavior (based on environment):");
+    log.error("Error message with default colors");
+    log.warn("Warning message with default colors");
+    log.info("Info message with default colors");
+    log.debug("Debug message with default colors");
+    console.log("\n--- Test 2: setColorize(true) - Colors Enabled ---");
+    setColorize(true);
+    log.error("Error message with colors enabled");
+    log.warn("Warning message with colors enabled");
+    log.info("Info message with colors enabled");
+    log.debug("Debug message with colors enabled");
+    console.log("\n--- Test 3: setColorize(false) - Colors Disabled ---");
+    setColorize(false);
+    log.error("Error message with colors disabled");
+    log.warn("Warning message with colors disabled");
+    log.info("Info message with colors disabled");
+    log.debug("Debug message with colors disabled");
+    console.log("\n--- Test 4: Colorization with Context Data ---");
+    setColorize(true);
+    log.info("User authentication", {
+        userId: 12345,
+        method: "oauth",
+        tags: ["auth", "success"]
+    });
+    setColorize(false);
+    log.error("Database connection failed", {
+        host: "db.example.com",
+        port: 5432,
+        error: "Connection timeout",
+        retryAttempt: 3,
+        tags: ["database", "error"]
+    });
+    console.log("\n--- Test 5: Colorization with Multiline Messages ---");
+    setColorize(true);
+    process.env.NODE_ENV = "development";
+    log.info(`Service initialization with colors:
+- Database connected
+- Cache initialized  
+- API endpoints loaded
+- Ready to accept requests`);
+    setColorize(false);
+    log.warn(`Service warning without colors:
+- High memory usage detected
+- Consider scaling up resources
+- Monitor performance metrics
+- Check for memory leaks`);
+    console.log("\n--- Test 6: Colorization in Production Mode ---");
+    process.env.NODE_ENV = "production";
+    setColorize(true);
+    console.log("Colors enabled in production mode:");
+    log.info("Production service started");
+    log.error("Production error occurred", { errorCode: 500 });
+    setColorize(false);
+    console.log("Colors disabled in production mode:");
+    log.info("Production service message");
+    log.error("Production error without colors", { errorCode: 404 });
+    console.log("\n--- Test 7: Dynamic Color Toggling ---");
+    console.log("Simulating runtime color control:");
+    const messages = [
+        { level: 'info', msg: 'Message 1', colored: true },
+        { level: 'warn', msg: 'Message 2', colored: false },
+        { level: 'error', msg: 'Message 3', colored: true },
+        { level: 'debug', msg: 'Message 4', colored: false }
+    ];
+    messages.forEach((item, index) => {
+        setColorize(item.colored);
+        console.log(`  ${index + 1}. Colors ${item.colored ? 'ON' : 'OFF'}:`);
+        log[item.level](item.msg, { toggle: item.colored, index: index + 1 });
+    });
+    console.log("\n--- Test 8: Return Value Validation ---");
+    const result1 = setColorize(true);
+    console.log(`setColorize(true) returned: ${result1}`);
+    const result2 = setColorize(false);
+    console.log(`setColorize(false) returned: ${result2}`);
+    setColorize(true);
+    delete process.env.NODE_ENV;
+    console.log("\n🎨 === COLORIZATION TESTS COMPLETED ===");
+}
+testColorize();
 console.log("\n🎉 === ALL TESTS COMPLETED ===");

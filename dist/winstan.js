@@ -27,7 +27,7 @@ https://github.com/DWTechs/Winstan.js
 import { isProperty, isString, isNumber, isArray, isObject, isAnsiEscapeCode, isLocale, isTimeZone, isStringOfLength } from '@dwtechs/checkard';
 
 var _a$4;
-const { NODE_ENV } = (_a$4 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$4 !== void 0 ? _a$4 : null;
+const { NODE_ENV: NODE_ENV$1 } = (_a$4 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$4 !== void 0 ? _a$4 : null;
 const dev = "debug";
 const prod = "info";
 const levels = {
@@ -44,7 +44,7 @@ function setLevel(lvl) {
 function shouldLog(lev) {
     return levels[lev] <= levels[level];
 }
-setLevel((NODE_ENV === "prod" || NODE_ENV === "production") ? prod : dev);
+setLevel((NODE_ENV$1 === "prod" || NODE_ENV$1 === "production") ? prod : dev);
 
 function formatTxt(value) {
     if (isString(value)) {
@@ -102,13 +102,23 @@ function setColors(newColors) {
 }
 
 var _a$3;
-const { COLORIZE } = (_a$3 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$3 !== void 0 ? _a$3 : null;
-let colorize = COLORIZE !== "false" && COLORIZE !== "0";
+const { COLORIZE, NODE_ENV } = (_a$3 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$3 !== void 0 ? _a$3 : null;
+let colorize;
+if (COLORIZE !== undefined)
+    colorize = COLORIZE !== "false" && COLORIZE !== "0";
+else {
+    const isProd = NODE_ENV === "production" || NODE_ENV === "prod";
+    colorize = !isProd;
+}
 const reset = '\x1b[0m';
 function formatColor(level, text) {
     if (!colorize)
         return text;
     return `${getColor(level)}${text}${reset}`;
+}
+function setColorize(clr) {
+    colorize = clr;
+    return colorize;
 }
 
 var _a$2;
@@ -231,4 +241,4 @@ const log = {
     }
 };
 
-export { log, setColors, setLevel, setLocale, setService, setTimeZone };
+export { log, setColorize, setColors, setLevel, setLocale, setService, setTimeZone };

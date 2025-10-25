@@ -177,7 +177,7 @@ You can configure Winstan using 2 methods :
 ### Environment variables
 --- 
 
-Four environment variables may be used by Winstan : 
+Five environment variables may be used by Winstan : 
 
 example :
 
@@ -186,6 +186,7 @@ example :
   TZ="UTC"
   NODE_ENV="production"
   SERVICE_NAME="ms_user"
+  COLORIZE="false"
 ```
 
 - if **NODE_ENV** is set to "production" or "prod", the log level will be set to **info**.  
@@ -198,6 +199,11 @@ If it is set to any other value, the log level will be set to **debug**.
 - **SERVICE_NAME** is the name of the service. (Or the application name)  
 If provided, it will appear in every log.  
 It is useful in a multi-service or multi-application monitoring tool.  
+
+- **COLORIZE** controls whether log output includes ANSI color codes.  
+Set to "false" or "0" to disable colors, or "true" or "1" to enable colors.  
+If not set, colors are automatically enabled in development mode and disabled in production mode.  
+This provides optimal defaults while allowing manual override when needed.  
 
 These environment variables will update the default values of the lib at start up.
 So you do not need to init the library in the code.
@@ -594,6 +600,30 @@ declare function setLocale(loc: string): string {}
  * setLevel('debug');
  */
 declare function setLevel(lvl: Level): Level {}
+
+/**
+ * Sets whether log output should include ANSI color codes.
+ * 
+ * @param {boolean} clr - Whether to enable colorization
+ *   - true: Enable ANSI color codes in log output
+ *   - false: Disable ANSI color codes (plain text output)
+ * 
+ * @returns {boolean} The current colorization state after the operation
+ * 
+ * @example
+ * // Enable colors for terminal output
+ * setColorize(true);
+ * 
+ * @example
+ * // Disable colors for file logging or CI/CD
+ * setColorize(false);
+ * 
+ * @example
+ * // Toggle based on environment detection
+ * const isTerminal = process.stdout.isTTY;
+ * setColorize(isTerminal);
+ */
+declare function setColorize(clr: boolean): boolean {}
 
 
 ```

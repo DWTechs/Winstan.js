@@ -34,6 +34,7 @@ declare const log: {
 };
 
 declare function setColors(newColors: Partial<Record<Level, string>> | null): void;
+declare function setColorize(clr: boolean): boolean;
 declare function setService(srv: string | undefined): string;
 declare function setTimeZone(tz: string): string;
 declare function setLocale(loc: string): string;
@@ -46,4 +47,5 @@ export {
   setLocale,
   setLevel,
   setColors,
+  setColorize,
 };
