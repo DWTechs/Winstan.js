@@ -232,7 +232,6 @@ setColors({
 
 // Enable/disable colorization
 setColorize(false);  // Disable colors for file output
-setColorize(true);   // Enable colors for terminal output
 
 // Configure locale for timestamp formatting
 setLocale("en-US");  // US English date format
