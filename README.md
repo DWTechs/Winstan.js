@@ -162,7 +162,7 @@ Winstan will start with the following default configuration :
 ```Javascript
   let locale = "fr-FR";
   let timeZone = "europe/paris";
-  let level = "debug";
+  let level = "debug"; // info in production mode
   let serviceName = "";
   let colorize = true; // false in production mode
 ```
