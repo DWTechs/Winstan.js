@@ -421,18 +421,19 @@ const log: {
  *   - Pass null to skip color updates
  *   - Invalid objects, invalid log levels, or invalid ANSI codes are silently ignored
  * 
- * @returns {void}
+ * @returns {Record<Level, string>} The current color configuration object after applying changes
  * 
  * @example
  * // Set custom colors for error and warning levels
- * setColors({
+ * const colors = setColors({
  *   error: '\x1b[91m',  // Bright red
  *   warn: '\x1b[93m'    // Bright yellow
  * });
+ * console.log(colors); // Shows all current color mappings
  * 
  * @example
  * // Set all colors at once
- * setColors({
+ * const allColors = setColors({
  *   error: '\x1b[31m',  // Red
  *   warn: '\x1b[33m',   // Yellow
  *   info: '\x1b[36m',   // Cyan
@@ -440,13 +441,13 @@ const log: {
  * });
  * 
  * @example
- * // Invalid calls are safely ignored
- * setColors(null);           // No-op
- * setColors("invalid");      // Ignored - not an object
- * setColors({ invalid: '\x1b[31m' }); // Ignored - invalid level
- * setColors({ error: 'red' });        // Ignored - invalid ANSI code
+ * // All calls return current colors
+ * const colors1 = setColors(null);           // Returns current colors (no changes)
+ * const colors2 = setColors("invalid");      // Returns current colors (ignored - not an object)
+ * const colors3 = setColors({ invalid: '\x1b[31m' }); // Returns current colors (invalid level ignored)
+ * const colors4 = setColors({ error: 'red' });        // Returns current colors (invalid ANSI ignored)
  */
-function setColors(newColors: Partial<Record<Level, string>> | null): void {}
+function setColors(newColors: Partial<Record<Level, string>> | null): Record<Level, string> {}
 
 /**
  * Sets the service name to be included in log messages.
