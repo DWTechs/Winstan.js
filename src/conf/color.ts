@@ -16,7 +16,7 @@ function getColor(level:Level): string {
  * Sets custom ANSI color codes for different log levels.
  * Only updates colors for valid log levels with valid ANSI escape codes.
  * 
- * @param {Partial<Record<Level, string>> | null} newColors - Object containing custom color mappings for log levels.
+ * @param {Partial<Record<Level, string>>} newColors - Object containing custom color mappings for log levels.
  *   - Can be a partial object with any combination of 'error', 'warn', 'info', 'debug' keys
  *   - Each value must be a valid ANSI escape code (e.g., '\x1b[31m' for red)
  *   - Pass null to skip color updates
@@ -48,8 +48,8 @@ function getColor(level:Level): string {
  * const colors3 = setColors({ invalid: '\x1b[31m' }); // Returns current colors (invalid level ignored)
  * const colors4 = setColors({ error: 'red' });        // Returns current colors (invalid ANSI ignored)
  */
-function setColors(newColors: Partial<Record<Level, string>> | null): Record<Level, string> {
-  // Validate that newColors is a valid object or null
+function setColors(newColors: Partial<Record<Level, string>>): Record<Level, string> {
+  // Validate that newColors is a valid object
   if (isObject(newColors)) {
     // Only update colors that exist in the original colors object and have valid ANSI codes
     for (const key in newColors) {

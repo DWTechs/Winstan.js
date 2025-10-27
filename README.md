@@ -415,10 +415,9 @@ const log: {
  * Sets custom ANSI color codes for different log levels.
  * Only updates colors for valid log levels with valid ANSI escape codes.
  * 
- * @param {Partial<Record<Level, string>> | null} newColors - Object containing custom color mappings for log levels.
+ * @param {Partial<Record<Level, string>>} newColors - Object containing custom color mappings for log levels.
  *   - Can be a partial object with any combination of 'error', 'warn', 'info', 'debug' keys
  *   - Each value must be a valid ANSI escape code (e.g., '\x1b[31m' for red)
- *   - Pass null to skip color updates
  *   - Invalid objects, invalid log levels, or invalid ANSI codes are silently ignored
  * 
  * @returns {Record<Level, string>} The current color configuration object after applying changes
@@ -447,7 +446,7 @@ const log: {
  * const colors3 = setColors({ invalid: '\x1b[31m' }); // Returns current colors (invalid level ignored)
  * const colors4 = setColors({ error: 'red' });        // Returns current colors (invalid ANSI ignored)
  */
-function setColors(newColors: Partial<Record<Level, string>> | null): Record<Level, string> {}
+function setColors(newColors: Partial<Record<Level, string>>): Record<Level, string> {}
 
 /**
  * Sets the service name to be included in log messages.
