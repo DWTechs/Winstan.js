@@ -7,6 +7,10 @@
 - **IMPROVED**: Enhanced multiline message handling:
   - Development: Indented continuation lines for better readability
   - Production: Escaped newlines within single logfmt entries
+- **NEW**: Added smart colorization with `COLORIZE` environment variable
+  - Colors automatically enabled in development mode, disabled in production mode
+  - Manual override via `COLORIZE` env var ("true"/"1" to enable, "false"/"0" to disable)
+  - Optimizes log output for different environments while allowing customization
 - **NEW**: Added initialization functions:
   - `setLevel()`
   - `setColors()`
@@ -14,10 +18,6 @@
   - `setLocale()`
   - `setTimeZone()`
   - `setService()`
-- **NEW**: Added smart colorization with `COLORIZE` environment variable
-  - Colors automatically enabled in development mode, disabled in production mode
-  - Manual override via `COLORIZE` env var ("true"/"1" to enable, "false"/"0" to disable)
-  - Optimizes log output for different environments while allowing customization
 - Update @dwtechs/checkard dependency to 3.6.0
 
 
