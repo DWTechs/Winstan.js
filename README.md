@@ -2,6 +2,7 @@
 [![License: MIT](https://img.shields.io/npm/l/@dwtechs/winstan.svg?color=brightgreen)](https://opensource.org/licenses/MIT)
 [![npm version](https://badge.fury.io/js/%40dwtechs%2Fwinstan.svg)](https://www.npmjs.com/package/@dwtechs/winstan)
 [![last version release date](https://img.shields.io/github/release-date/DWTechs/Winstan.js)](https://www.npmjs.com/package/@dwtechs/winstan)
+![Jest:coverage](https://img.shields.io/badge/Jest:coverage-100%25-brightgreen.svg)
 
 - [Synopsis](#synopsis)
 - [Support](#support)
@@ -198,15 +199,13 @@ It is useful in a multi-service or multi-application monitoring tool.
 - **COLORIZE** controls whether log output includes ANSI color codes.  
 Set to "false" or "0" to disable colors, or "true" or "1" to enable colors.  
 If not set, colors are automatically enabled in development mode and disabled in production mode.  
-This provides optimal defaults while allowing manual override when needed.  
 
 These environment variables will update the default values of the lib at start up.
-So you do not need to init the library in the code.
 
 ### Runtime Configuration Methods
 ---
 
-Winstan provides several methods to configure settings at runtime, which will override both default values and environment variables:
+Winstan also provides several methods to configure settings at runtime, which will override both default values and environment variables:
 
 ```javascript
 import { 
@@ -252,6 +251,7 @@ log.info("Application started with custom settings");
 - **Return Values**: All methods return the current value for confirmation
 - **Validation**: Invalid inputs are ignored, current settings remain unchanged
 - **Flexible Timing**: Can be called at any time during application lifecycle
+
 
 ### Log Formatting Modes
 ---
