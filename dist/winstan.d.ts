@@ -33,7 +33,7 @@ declare const log: {
   debug: (txt: string, ctx?: Record<string, string | number | string[] | number[]>) => void;
 };
 
-declare function setColors(newColors: Partial<Record<Level, string>> | null): void;
+declare function setColors(newColors: Partial<Record<Level, string>>): Record<Level, string>;
 declare function setColorize(clr: boolean): boolean;
 declare function setService(srv: string | undefined): string;
 declare function setTimeZone(tz: string): string;

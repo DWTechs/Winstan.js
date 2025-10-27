@@ -91,14 +91,15 @@ function getColor(level) {
     return colors[level] || '';
 }
 function setColors(newColors) {
-    if (!isObject(newColors) && newColors !== null)
-        return;
-    for (const key in newColors) {
-        const l = key;
-        const v = newColors[l];
-        if (isProperty(colors, l) && isAnsiEscapeCode(v))
-            colors[l] = v;
+    if (isObject(newColors)) {
+        for (const key in newColors) {
+            const l = key;
+            const v = newColors[l];
+            if (isProperty(colors, l) && isAnsiEscapeCode(v))
+                colors[l] = v;
+        }
     }
+    return colors;
 }
 
 var _a$3;
