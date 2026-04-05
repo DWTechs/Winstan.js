@@ -1,11 +1,13 @@
 export type Level = 'error' | 'warn' | 'info' | 'debug';
 
 declare const log: {
-  error: (txt: string, ctx?: Record<string, string | number | string[] | number[]>) => void;
-  warn: (txt: string, ctx?: Record<string, string | number | string[] | number[]>) => void;
-  info: (txt: string, ctx?: Record<string, string | number | string[] | number[]>) => void;
-  debug: (txt: string, ctx?: Record<string, string | number | string[] | number[]>) => void;
+  error: (txt: string | (() => string), ctx?: Record<string, string | number | string[] | number[]>) => void;
+  warn: (txt: string | (() => string), ctx?: Record<string, string | number | string[] | number[]>) => void;
+  info: (txt: string | (() => string), ctx?: Record<string, string | number | string[] | number[]>) => void;
+  debug: (txt: string | (() => string), ctx?: Record<string, string | number | string[] | number[]>) => void;
 };
+
+declare function isLevelEnabled(lvl: Level): boolean;
 
 declare function setColors(newColors: Partial<Record<Level, string>>): Record<Level, string>;
 declare function setColorize(clr: boolean): boolean;
@@ -16,6 +18,7 @@ declare function setLevel(lvl: Level): Level;
 
 export { 
   log,
+  isLevelEnabled,
   setService,
   setTimeZone,
   setLocale,

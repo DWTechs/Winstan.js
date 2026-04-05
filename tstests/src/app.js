@@ -1,4 +1,4 @@
-import { log, setService, setColorize } from "../../dist/winstan.js";
+import { log, setService, setColorize, isLevelEnabled } from "../../dist/winstan.js";
 function runTests(mode) {
     console.log(`\n🧪 === TESTING ${mode.toUpperCase()} MODE ===`);
     console.log(`NODE_ENV: ${process.env.NODE_ENV || 'undefined'}`);
@@ -187,4 +187,43 @@ function testColorize() {
     console.log("\n🎨 === COLORIZATION TESTS COMPLETED ===");
 }
 testColorize();
+function testFunctionParams() {
+    console.log("\n⚡ === TESTING FUNCTION AS PARAMETER ===");
+    console.log("NOTE: Functions are only called when the log level is enabled\n");
+    console.log("--- Test 1: Function returning a string ---");
+    log.info(() => "Info from a function");
+    log.warn(() => "Warning from a function");
+    log.error(() => "Error from a function");
+    log.debug(() => "Debug from a function");
+    console.log("\n--- Test 2: Function with context ---");
+    log.info(() => "Info with context from function", { requestId: 123 });
+    log.debug(() => "Debug with context from function", { userId: 456, tags: ["fn", "lazy"] });
+    console.log("\n--- Test 3: isLevelEnabled ---");
+    console.log(`isLevelEnabled('error'): ${isLevelEnabled('error')}`);
+    console.log(`isLevelEnabled('warn'):  ${isLevelEnabled('warn')}`);
+    console.log(`isLevelEnabled('info'):  ${isLevelEnabled('info')}`);
+    console.log(`isLevelEnabled('debug'): ${isLevelEnabled('debug')}`);
+    console.log("\n--- Test 4: Function not called when level is disabled ---");
+    let callCount = 0;
+    const counted = () => { callCount++; return "Should not appear"; };
+    if (!isLevelEnabled('debug')) {
+        console.log("(debug disabled — counted() will not be invoked by log.debug)");
+        log.debug(counted);
+        console.log(`callCount: ${callCount} (expected 0)`);
+    }
+    else {
+        console.log("(debug enabled — counted() will be invoked)");
+        log.debug(counted);
+        console.log(`callCount: ${callCount} (expected 1)`);
+    }
+    console.log("\n--- Test 5: Function returning empty string (should not log) ---");
+    log.info(() => "");
+    log.debug(() => "");
+    console.log("(No output expected for empty string functions)");
+    console.log("\n--- Test 6: Function with multiline return ---");
+    log.info(() => "Lazy multiline:\nLine A\nLine B\nLine C");
+    log.debug(() => `Lazy template:\n- item 1\n- item 2\n- item 3`, { requestId: 789 });
+    console.log("\n⚡ === FUNCTION PARAMETER TESTS COMPLETED ===");
+}
+testFunctionParams();
 console.log("\n🎉 === ALL TESTS COMPLETED ===");

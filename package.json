@@ -1,6 +1,7 @@
 {
   "name": "@dwtechs/winstan",
-  "version": "0.5.0",
+  "version": "0.6.0",
+  "type": "module",
   "description": "Open source log library for Node.js for easy and lightweight logging.",
   "keywords": [
     "logs", "logger"
@@ -26,7 +27,7 @@
   "scripts": {
     "start": "",
     "prebuild": "npm install",
-    "build": "node ./scripts/clear && tsc -p tsconfig.lib.json && npm run rollup && node ./scripts/copy && npm run test",
+    "build": "node ./scripts/clear.cjs && tsc -p tsconfig.lib.json && npm run rollup && node ./scripts/copy.cjs && npm run test",
     "rollup:mjs": "rollup --config rollup.config.mjs",
     "rollup:cjs": "rollup --config rollup.config.cjs.mjs",
     "rollup": "npm run rollup:mjs",

@@ -214,12 +214,16 @@ function msg(lvl, txt, ctx) {
     logfmtLine += ` msg=${formattedTxt}`;
     return formatColor(lvl, logfmtLine);
 }
+function isLevelEnabled(lvl) {
+    return shouldLog(lvl);
+}
 function print(lvl, txt, ctx) {
     if (!shouldLog(lvl))
         return;
-    if (!isString(txt, "!0"))
+    const resolved = typeof txt === 'function' ? txt() : txt;
+    if (!isString(resolved, "!0"))
         return;
-    const m = msg(lvl, txt, ctx || {});
+    const m = msg(lvl, resolved, ctx || {});
     if (lvl === 'error')
         console.error(m);
     else if (lvl === 'warn')
@@ -242,4 +246,4 @@ const log = {
     }
 };
 
-export { log, setColorize, setColors, setLevel, setLocale, setService, setTimeZone };
+export { isLevelEnabled, log, setColorize, setColors, setLevel, setLocale, setService, setTimeZone };

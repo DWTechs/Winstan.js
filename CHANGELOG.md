@@ -1,3 +1,9 @@
+# 0.6.0 (Apr 1st 2026)
+
+- **PERF**: `log` methods now accept a function `() => string` as the `txt` parameter for lazy evaluation. The function is only called when the log level is enabled, avoiding unnecessary string construction.
+- **NEW**: Added `isLevelEnabled(lvl)` to check whether a given log level is active. Useful for guarding additional logic beyond logging against the current log level.
+
+
 # 0.5.0 (Oct 20th 2025)
 
 - No longer uses Winston as a dependency

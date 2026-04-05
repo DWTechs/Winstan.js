@@ -1,4 +1,4 @@
-export { log } from './logger';
+export { log, isLevelEnabled } from './logger';
 export { setColors } from './conf/color';
 export { setColorize } from './format/color';
 export { setLevel } from './conf/level';

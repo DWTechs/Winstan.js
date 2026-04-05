@@ -87,19 +87,25 @@ function msg(lvl: Level, txt: string, ctx: Record<string, string | number | stri
 // init(TZ, LOCALE, SERVICE_NAME, defaultLevel);
 
 
+function isLevelEnabled(lvl: Level): boolean {
+  return shouldLog(lvl);
+}
+
 function print(
   lvl: Level,
-  txt: string,
+  txt: string | (() => string),
   ctx?: Record<string, string | number | string[] | number[]>
 ): void {
   
   if (!shouldLog(lvl))
     return;
 
-  if (!isString(txt, "!0"))
+  const resolved = typeof txt === 'function' ? txt() : txt;
+
+  if (!isString(resolved, "!0"))
     return;
   
-  const m = msg(lvl, txt, ctx || {});
+  const m = msg(lvl, resolved, ctx || {});
   
   // Output to console
   if (lvl === 'error')
@@ -176,7 +182,7 @@ const log = {
    * log.error('Authentication failed', { userId: 123, reason: 'invalid_token' });
    */
   error: (
-    txt: string,
+    txt: string | (() => string),
     ctx?: Record<string, string | number | string[] | number[]>,
   ) => {
     print('error', txt, ctx);
@@ -186,7 +192,7 @@ const log = {
    * Logs warning messages for conditions that should be noted but don't require immediate action.
    * Uses console.warn() for output and appears in yellow when colors are enabled.
    * 
-   * @param {string} txt - The warning message to log
+   * @param {string | (() => string)} txt - The warning message to log, or a function returning it
    * @param {Record<string, string | number | string[] | number[]>} [ctx] - Optional context object with additional fields
    * 
    * @example
@@ -194,7 +200,7 @@ const log = {
    * log.warn('Deprecated function used', { function: 'oldMethod', caller: 'userService' });
    */
   warn: (
-    txt: string,
+    txt: string | (() => string),
     ctx?: Record<string, string | number | string[] | number[]>,
   ) => {
     print('warn', txt, ctx);
@@ -204,7 +210,7 @@ const log = {
    * Logs informational messages for general application events.
    * Uses console.log() for output and appears in blue when colors are enabled.
    * 
-   * @param {string} txt - The information message to log
+   * @param {string | (() => string)} txt - The information message to log, or a function returning it
    * @param {Record<string, string | number | string[] | number[]>} [ctx] - Optional context object with additional fields
    * 
    * @example
@@ -212,7 +218,7 @@ const log = {
    * log.info('User action completed', { action: 'purchase', userId: 456, amount: 29.99 });
    */
   info: (
-    txt: string,
+    txt: string | (() => string),
     ctx?: Record<string, string | number | string[] | number[]>,
   ) => {
     print('info', txt, ctx);
@@ -223,7 +229,7 @@ const log = {
    * Uses console.log() for output and appears in green when colors are enabled.
    * Only shown when log level is set to 'debug'.
    * 
-   * @param {string} txt - The debug message to log
+   * @param {string | (() => string)} txt - The debug message to log, or a function returning it
    * @param {Record<string, string | number | string[] | number[]>} [ctx] - Optional context object with additional fields
    * 
    * @example
@@ -231,7 +237,7 @@ const log = {
    * log.debug('SQL query executed', { query: 'SELECT * FROM users', duration: '15ms' });
    */
   debug: (
-    txt: string,
+    txt: string | (() => string),
     ctx?: Record<string, string | number | string[] | number[]>,
   ) => {
     print('debug', txt, ctx);
@@ -239,4 +245,4 @@ const log = {
 };
 
 
-export { log, msg };
+export { log, msg, isLevelEnabled };

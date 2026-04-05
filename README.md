@@ -66,6 +66,23 @@ log.debug(
 );
 ```
 
+#### Lazy Evaluation
+
+For expensive string construction, pass a function instead of a string. It will only be called if the log level is active:
+
+```javascript
+import { log, isLevelEnabled } from "@dwtechs/winstan";
+
+// Function is only called when debug level is enabled
+log.debug(() => `Heavy computation result: ${JSON.stringify(heavyObject)}`);
+
+// Guard additional logic beyond logging
+if (isLevelEnabled('debug')) {
+  const diagnostic = runExpensiveDiagnostic();
+  log.debug(`Diagnostic: ${diagnostic}`);
+}
+```
+
 #### Advanced Examples with Context Values
 
 ```javascript
@@ -351,7 +368,7 @@ const log: {
    * Logs error messages for critical issues requiring immediate attention.
    * Uses console.error() for output and appears in red when colors are enabled.
    * 
-   * @param {string} txt - The error message to log
+   * @param {string | (() => string)} txt - The error message to log, or a function returning it (lazy evaluation)
    * @param {Record<string, string | number | string[] | number[]>} [ctx] - Optional context object with additional fields
    * 
    * @example
@@ -359,14 +376,14 @@ const log: {
    * log.error('Authentication failed', { userId: 123, reason: 'invalid_token' });
    */
   error: (
-    txt: string, 
+    txt: string | (() => string), 
     ctx?: Record<string, string | number | string[] | number[]>
   ): void => {},
   /**
    * Logs warning messages for conditions that should be noted but don't require immediate action.
    * Uses console.warn() for output and appears in yellow when colors are enabled.
    * 
-   * @param {string} txt - The warning message to log
+   * @param {string | (() => string)} txt - The warning message to log, or a function returning it (lazy evaluation)
    * @param {Record<string, string | number | string[] | number[]>} [ctx] - Optional context object with additional fields
    * 
    * @example
@@ -374,14 +391,14 @@ const log: {
    * log.warn('Deprecated function used', { function: 'oldMethod', caller: 'userService' });
    */
   warn: (
-    txt: string,
+    txt: string | (() => string),
     ctx?: Record<string, string | number | string[] | number[]>
   ): void => {},
   /**
    * Logs informational messages for general application events.
    * Uses console.log() for output and appears in blue when colors are enabled.
    * 
-   * @param {string} txt - The information message to log
+   * @param {string | (() => string)} txt - The information message to log, or a function returning it (lazy evaluation)
    * @param {Record<string, string | number | string[] | number[]>} [ctx] - Optional context object with additional fields
    * 
    * @example
@@ -389,7 +406,7 @@ const log: {
    * log.info('User action completed', { action: 'purchase', userId: 456, amount: 29.99 });
    */
   info: (
-    txt: string,
+    txt: string | (() => string),
     ctx?: Record<string, string | number | string[] | number[]>
   ): void => {},
   /**
@@ -397,15 +414,15 @@ const log: {
    * Uses console.log() for output and appears in green when colors are enabled.
    * Only shown when log level is set to 'debug'.
    * 
-   * @param {string} txt - The debug message to log
+   * @param {string | (() => string)} txt - The debug message to log, or a function returning it (lazy evaluation)
    * @param {Record<string, string | number | string[] | number[]>} [ctx] - Optional context object with additional fields
    * 
    * @example
    * log.debug('Cache miss for key', { key: 'user:123', ttl: 300 });
-   * log.debug('SQL query executed', { query: 'SELECT * FROM users', duration: '15ms' });
+   * log.debug(() => `SQL query executed: ${buildQuery()}`, { duration: '15ms' });
    */
   debug: (
-    txt: string,
+    txt: string | (() => string),
     ctx?: Record<string, string | number | string[] | number[]>
   ): void => {},
 };
@@ -655,6 +672,28 @@ declare function setLevel(lvl: Level): Level {}
  * setColorize(isTerminal);
  */
 declare function setColorize(clr: boolean): boolean {}
+
+/**
+ * Checks whether a given log level is currently active.
+ * Useful for guarding additional logic beyond logging against the current log level,
+ * or for avoiding expensive computations when the level would be filtered out.
+ * 
+ * @param {Level} lvl - The log level to check: 'error', 'warn', 'info', or 'debug'
+ * 
+ * @returns {boolean} true if logs at this level would be output, false otherwise
+ * 
+ * @example
+ * // Guard expensive work
+ * if (isLevelEnabled('debug')) {
+ *   const report = buildDetailedReport();
+ *   log.debug(`Report: ${report}`);
+ * }
+ * 
+ * @example
+ * // Prefer the lazy function form for simple cases
+ * log.debug(() => `Expensive: ${JSON.stringify(hugeObject)}`);
+ */
+declare function isLevelEnabled(lvl: Level): boolean {}
 
 
 ```
