@@ -4,19 +4,28 @@ import {
   isArray
 } from "@dwtechs/checkard";
 
+const ESCAPE_RE = /[\\"\n\r\t]/g;
+const QUOTE_CHECK_RE = /[\s"'=\\]/;
+const ARRAY_QUOTE_RE = /"/g;
+
+function escapeChar(c: string): string {
+  switch (c) {
+    case '\\': return '\\\\';
+    case '"':  return '\\"';
+    case '\n': return '\\n';
+    case '\r': return '\\r';
+    case '\t': return '\\t';
+    default:   return c;
+  }
+}
+
 // Helper to format values for logfmt
 function formatTxt(value: string | number | string[] | number[]): string {
   if (isString(value)) {
-    // Escape newlines and other special characters for logfmt
-    const escaped = (value as string)
-      .replace(/\\/g, '\\\\')  // Escape backslashes first
-      .replace(/"/g, '\\"')    // Escape quotes
-      .replace(/\n/g, '\\n')   // Escape newlines
-      .replace(/\r/g, '\\r')   // Escape carriage returns
-      .replace(/\t/g, '\\t');  // Escape tabs
+    const escaped = (value as string).replace(ESCAPE_RE, escapeChar);
     
     // Quote if contains spaces or special characters
-    if (/[\s"'=\\]/.test(escaped)) {
+    if (QUOTE_CHECK_RE.test(escaped)) {
       return `"${escaped}"`;
     }
     return escaped;
@@ -25,7 +34,7 @@ function formatTxt(value: string | number | string[] | number[]): string {
   } else if (isArray(value)) {
     // Format arrays as comma-separated quoted values
     const items = (value as (string | number)[]).map(item => 
-      isString(item) ? `"${item.toString().replace(/"/g, '\\"')}"` : item.toString()
+      isString(item) ? `"${item.toString().replace(ARRAY_QUOTE_RE, '\\"')}"` : item.toString()
     );
     return `[${items.join(',')}]`;
   }

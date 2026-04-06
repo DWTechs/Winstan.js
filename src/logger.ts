@@ -7,15 +7,23 @@ import { formatTxt } from "./format/txt.js";
 import { formatService } from "./format/service.js";
 import type { Level } from "./types";
 
+// NODE_ENV is read ONCE at module load. Changing process.env.NODE_ENV after import has no effect.
+const isProduction = process?.env?.NODE_ENV === "production" || process?.env?.NODE_ENV === "prod";
+const NEWLINE_RE = /[\n\r]+/;
+const WHITESPACE_RE = /\s{2,}/g;
+const LEVEL_PREFIX: Record<string, string> = {
+  error: "level=error",
+  warn:  "level=warn",
+  info:  "level=info",
+  debug: "level=debug",
+};
+
 function msg(lvl: Level, txt: string, ctx: Record<string, string | number | string[] | number[]>): string {
   
   const ts = formatDate();
   const misc = formatMisc(ctx);
   const service = formatService();
-  const l = `level=${lvl}`;
-  
-  // Check environment for output format (dynamic check)
-  const isProduction = process?.env?.NODE_ENV === "production" || process?.env?.NODE_ENV === "prod";
+  const l = LEVEL_PREFIX[lvl];
   
   // Production format: pure logfmt (single line with escaped newlines)
   if (isProduction) {
@@ -37,11 +45,11 @@ function msg(lvl: Level, txt: string, ctx: Record<string, string | number | stri
   }
   
   // Development format (default): human-readable multiline
-  const lines = txt?.toString().split(/[\n\r]+/) || [];
+  const lines = txt?.toString().split(NEWLINE_RE) || [];
   if (lines.length > 1) {
     let result = '';
     lines.forEach((line, i) => {
-      const trimmedLine = line.replace(/\s{2,}/g, " ").trim();
+      const trimmedLine = line.replace(WHITESPACE_RE, " ").trim();
       if (i === 0) {
         // First line uses the full context
         let firstLine = `${ts} ${l}`;
@@ -77,14 +85,6 @@ function msg(lvl: Level, txt: string, ctx: Record<string, string | number | stri
   
   return formatColor(lvl, logfmtLine);
 }
-
-
-// // Initialize with environment variables
-// const { LOCALE, TZ, SERVICE_NAME, NODE_ENV } = process?.env ?? {};
-// const defaultLevel: Level = (NODE_ENV === "prod" || NODE_ENV === "production") ? "info" : "debug";
-
-// // Initialize on module load
-// init(TZ, LOCALE, SERVICE_NAME, defaultLevel);
 
 
 function isLevelEnabled(lvl: Level): boolean {

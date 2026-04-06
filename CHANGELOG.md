@@ -1,3 +1,14 @@
+# 0.7.0 (Apr 6th 2026)
+
+- **PERF**: Cache `Intl.DateTimeFormat` instances in `formatDate()`. Formatters are now rebuilt only when locale or timezone changes, eliminating object allocation on every log call.
+- **PERF**: `isProduction` flag is now evaluated once at module load instead of on every `msg()` call.
+- **PERF**: `NEWLINE_RE` and `WHITESPACE_RE` regex literals hoisted to module-level constants in `logger.ts` to avoid recompilation per call.
+- **PERF**: `level=<value>` strings pre-computed in a lookup map (`LEVEL_PREFIX`) to avoid template literal allocation per log call.
+- **PERF**: The 5 chained `.replace()` calls in `formatTxt()` replaced by a single-pass regex with a `switch`-based replacer function.
+- **PERF**: `QUOTE_CHECK_RE` and `ARRAY_QUOTE_RE` regex literals hoisted to module-level constants in `txt.ts`.
+- **PERF**: Trailing space removal in `formatMisc()` replaced with `slice(0, -1)` (O(1)) instead of `.trim()` (O(n)).
+
+
 # 0.6.0 (Apr 1st 2026)
 
 - **PERF**: `log` methods now accept a function `() => string` as the `txt` parameter for lazy evaluation. The function is only called when the log level is enabled, avoiding unnecessary string construction.

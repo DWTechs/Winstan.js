@@ -26,8 +26,8 @@ https://github.com/DWTechs/Winstan.js
 
 import { isProperty, isString, isNumber, isArray, isObject, isAnsiEscapeCode, isLocale, isTimeZone, isStringOfLength } from '@dwtechs/checkard';
 
-var _a$4;
-const { NODE_ENV: NODE_ENV$1 } = (_a$4 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$4 !== void 0 ? _a$4 : null;
+var _a$5;
+const { NODE_ENV: NODE_ENV$1 } = (_a$5 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$5 !== void 0 ? _a$5 : null;
 const dev = "debug";
 const prod = "info";
 const levels = {
@@ -46,15 +46,23 @@ function shouldLog(lev) {
 }
 setLevel((NODE_ENV$1 === "prod" || NODE_ENV$1 === "production") ? prod : dev);
 
+const ESCAPE_RE = /[\\"\n\r\t]/g;
+const QUOTE_CHECK_RE = /[\s"'=\\]/;
+const ARRAY_QUOTE_RE = /"/g;
+function escapeChar(c) {
+    switch (c) {
+        case '\\': return '\\\\';
+        case '"': return '\\"';
+        case '\n': return '\\n';
+        case '\r': return '\\r';
+        case '\t': return '\\t';
+        default: return c;
+    }
+}
 function formatTxt(value) {
     if (isString(value)) {
-        const escaped = value
-            .replace(/\\/g, '\\\\')
-            .replace(/"/g, '\\"')
-            .replace(/\n/g, '\\n')
-            .replace(/\r/g, '\\r')
-            .replace(/\t/g, '\\t');
-        if (/[\s"'=\\]/.test(escaped)) {
+        const escaped = value.replace(ESCAPE_RE, escapeChar);
+        if (QUOTE_CHECK_RE.test(escaped)) {
             return `"${escaped}"`;
         }
         return escaped;
@@ -63,7 +71,7 @@ function formatTxt(value) {
         return value.toString();
     }
     else if (isArray(value)) {
-        const items = value.map(item => isString(item) ? `"${item.toString().replace(/"/g, '\\"')}"` : item.toString());
+        const items = value.map(item => isString(item) ? `"${item.toString().replace(ARRAY_QUOTE_RE, '\\"')}"` : item.toString());
         return `[${items.join(',')}]`;
     }
     return String(value);
@@ -78,7 +86,7 @@ function formatMisc(ctx) {
         if (isString(v, "!0") || isNumber(v, false) || isArray(v, ">", 0))
             m += `${key}=${formatTxt(v)} `;
     }
-    return m.trim();
+    return m.length > 0 ? m.slice(0, -1) : m;
 }
 
 const colors = {
@@ -102,8 +110,8 @@ function setColors(newColors) {
     return colors;
 }
 
-var _a$3;
-const { COLORIZE, NODE_ENV } = (_a$3 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$3 !== void 0 ? _a$3 : null;
+var _a$4;
+const { COLORIZE, NODE_ENV } = (_a$4 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$4 !== void 0 ? _a$4 : null;
 let colorize;
 if (COLORIZE !== undefined)
     colorize = COLORIZE !== "false" && COLORIZE !== "0";
@@ -122,8 +130,8 @@ function setColorize(clr) {
     return colorize;
 }
 
-var _a$2;
-const { LOCALE } = (_a$2 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$2 !== void 0 ? _a$2 : null;
+var _a$3;
+const { LOCALE } = (_a$3 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$3 !== void 0 ? _a$3 : null;
 const def = 'fr-FR';
 let locale = isLocale(LOCALE) ? LOCALE : def;
 function setLocale(loc) {
@@ -132,8 +140,8 @@ function setLocale(loc) {
     return locale;
 }
 
-var _a$1;
-const { TZ } = (_a$1 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$1 !== void 0 ? _a$1 : null;
+var _a$2;
+const { TZ } = (_a$2 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$2 !== void 0 ? _a$2 : null;
 const dTimeZone = 'Europe/Paris';
 let timeZone = isTimeZone(TZ) ? TZ : dTimeZone;
 function setTimeZone(tz) {
@@ -142,16 +150,27 @@ function setTimeZone(tz) {
     return timeZone;
 }
 
+let cachedLocale = '';
+let cachedTimeZone = '';
+let dateFormatter;
+let timeFormatter;
+function getFormatters() {
+    if (locale !== cachedLocale || timeZone !== cachedTimeZone) {
+        cachedLocale = locale;
+        cachedTimeZone = timeZone;
+        dateFormatter = new Intl.DateTimeFormat(cachedLocale, { timeZone: cachedTimeZone, year: 'numeric', month: 'numeric', day: 'numeric' });
+        timeFormatter = new Intl.DateTimeFormat(cachedLocale, { timeZone: cachedTimeZone, hour: 'numeric', minute: 'numeric', second: 'numeric' });
+    }
+}
 function formatDate() {
+    getFormatters();
     const now = new Date();
-    const date = now.toLocaleDateString(locale, { timeZone });
-    const time = now.toLocaleTimeString(locale, { timeZone });
     const ms = now.getMilliseconds().toString().padStart(3, '0');
-    return `time=${date} ${time}:${ms}`;
+    return `time=${dateFormatter.format(now)} ${timeFormatter.format(now)}:${ms}`;
 }
 
-var _a;
-const { SERVICE_NAME } = (_a = process === null || process === void 0 ? void 0 : process.env) !== null && _a !== void 0 ? _a : null;
+var _a$1;
+const { SERVICE_NAME } = (_a$1 = process === null || process === void 0 ? void 0 : process.env) !== null && _a$1 !== void 0 ? _a$1 : null;
 let service = "";
 function setService(srv) {
     if (isStringOfLength(srv, 1, 99))
@@ -168,13 +187,21 @@ function formatService() {
     return service ? `service=${formatTxt(service)}` : "";
 }
 
+var _a, _b;
+const isProduction = ((_a = process === null || process === void 0 ? void 0 : process.env) === null || _a === void 0 ? void 0 : _a.NODE_ENV) === "production" || ((_b = process === null || process === void 0 ? void 0 : process.env) === null || _b === void 0 ? void 0 : _b.NODE_ENV) === "prod";
+const NEWLINE_RE = /[\n\r]+/;
+const WHITESPACE_RE = /\s{2,}/g;
+const LEVEL_PREFIX = {
+    error: "level=error",
+    warn: "level=warn",
+    info: "level=info",
+    debug: "level=debug",
+};
 function msg(lvl, txt, ctx) {
-    var _a, _b;
     const ts = formatDate();
     const misc = formatMisc(ctx);
     const service = formatService();
-    const l = `level=${lvl}`;
-    const isProduction = ((_a = process === null || process === void 0 ? void 0 : process.env) === null || _a === void 0 ? void 0 : _a.NODE_ENV) === "production" || ((_b = process === null || process === void 0 ? void 0 : process.env) === null || _b === void 0 ? void 0 : _b.NODE_ENV) === "prod";
+    const l = LEVEL_PREFIX[lvl];
     if (isProduction) {
         let logfmtLine = `${ts} ${l}`;
         if (service)
@@ -185,11 +212,11 @@ function msg(lvl, txt, ctx) {
         logfmtLine += ` msg=${formattedTxt}`;
         return formatColor(lvl, logfmtLine);
     }
-    const lines = (txt === null || txt === void 0 ? void 0 : txt.toString().split(/[\n\r]+/)) || [];
+    const lines = (txt === null || txt === void 0 ? void 0 : txt.toString().split(NEWLINE_RE)) || [];
     if (lines.length > 1) {
         let result = '';
         lines.forEach((line, i) => {
-            const trimmedLine = line.replace(/\s{2,}/g, " ").trim();
+            const trimmedLine = line.replace(WHITESPACE_RE, " ").trim();
             if (i === 0) {
                 let firstLine = `${ts} ${l}`;
                 if (service)

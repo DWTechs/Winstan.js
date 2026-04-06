@@ -15,7 +15,7 @@ function formatMisc(ctx: Record<string, string | number | string[] | number[]>):
     if (isString(v, "!0") || isNumber(v, false) || isArray(v, ">", 0))
       m += `${key}=${formatTxt(v)} `;
   }
-  return m.trim();
+  return m.length > 0 ? m.slice(0, -1) : m;
 }
 
 export {

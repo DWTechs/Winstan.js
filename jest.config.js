@@ -1,7 +1,5 @@
-// For a detailed explanation regarding each configuration property, visit:
-// https://jestjs.io/docs/en/configuration.html
-
-module.exports = {
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+export default {
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -69,12 +67,34 @@ module.exports = {
   moduleFileExtensions: [
     "js",
     "mjs",
-  //   "json",
-  //   "jsx",
-  //   "ts",
-  //   "tsx",
-  //   "node"
+    "ts",
   ],
+
+  // Map .js imports to .ts source files (TypeScript ESM convention)
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+
+  // Allow Jest to transform @dwtechs ESM packages (ch.js ships ESM without "type":"module")
+  transformIgnorePatterns: [
+    '/node_modules/(?!@dwtechs/)',
+  ],
+
+  // ts-jest in ESM mode
+  extensionsToTreatAsEsm: ['.ts'],
+  transform: {
+    '^.+\.ts$': ['ts-jest', {
+      useESM: true,
+      tsconfig: 'tsconfig.jest.json',
+    }],
+    '^.+\.js$': ['ts-jest', {
+      useESM: true,
+      tsconfig: 'tsconfig.jest.json',
+    }],
+  },
+
+  // Only run files in tests/
+  testMatch: ['**/tests/**/*.test.ts'],
 
   // A map from regular expressions to module names that allow to stub out resources with a single module
   // moduleNameMapper: {},

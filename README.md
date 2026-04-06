@@ -219,6 +219,8 @@ If not set, colors are automatically enabled in development mode and disabled in
 
 These environment variables will update the default values of the lib at start up.
 
+> **Important**: `NODE_ENV` and `COLORIZE` are read **once at module load** and are immutable after that point. Changing `process.env.NODE_ENV` or `process.env.COLORIZE` at runtime has no effect. Make sure to set these variables before importing Winstan.
+
 ### Runtime Configuration Methods
 ---
 

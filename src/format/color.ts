@@ -1,7 +1,8 @@
 import { getColor } from "../conf/color";
 import type { Level } from "../types";
 
-// Check environment variables at startup
+// COLORIZE and NODE_ENV are read ONCE at module load and cannot be changed at runtime.
+// Set these environment variables before importing this library.
 const { COLORIZE, NODE_ENV } = process?.env ?? null;
 
 // Determine colorization setting once at startup
