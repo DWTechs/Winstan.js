@@ -1,3 +1,8 @@
+# 0.7.1 (May 28th 2026)
+
+- **FIX**: Add missing file extensions to `main` (`dist/winstan.js`) and `types` (`dist/winstan.d.ts`) fields in `package.json`.
+
+
 # 0.7.0 (Apr 6th 2026)
 
 - **PERF**: Cache `Intl.DateTimeFormat` instances in `formatDate()`. Formatters are now rebuilt only when locale or timezone changes, eliminating object allocation on every log call.
